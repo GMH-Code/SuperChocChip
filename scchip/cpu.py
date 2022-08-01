@@ -54,19 +54,23 @@ class CPU:
 
         self.core_interval = None if auto_clock_speed <= 0 else 1.0 / auto_clock_speed
 
-        # Quirks should be all set to False when running Super-CHIP 1.1 / XO-CHIP
-        # Load quirks should default to ON if arch > Super-CHIP 1.0
-        # For CHIP-48, we should also set arch to Super-CHIP 1.0, set load_quirks to False (default for CHIP-8 and
-        # Super-CHIP 1.0), index_increment_quirks to True, shift_quirks to True and jump_quirks to True.
+        """
+        Quirks
+        ------
+
+        - Load quirks should default to enabled if emulating Super-CHIP 1.1, or above, but not below that.
+        - Shift quirks should always default to enabled.  Some say this should only be set if emulating beyond CHIP-8,
+          but that breaks too many games in regular CHIP-8 mode.
+        - Logic quirks should be enabled if emulating Super-CHIP 1.0, CHIP-48, or above.
+        - Index overflow quirks should be disabled by default.  Some Super-CHIP games fail if enabled.
+        - Index increment quirks should be disabled by default, but enable for accurate CHIP-48 behaviour.
+        - Jump quirks should be disabled by default, unless emulating CHIP-48 (only).
+        """
+
         self.load_quirks = arch >= ARCH_SUPERCHIP_1_1 if load_quirks is None else load_quirks
-        # Shift quirks should always default to ON.  Some say this should only be set if arch > CHIP-8, but this breaks
-        # too many games.
         self.shift_quirks = True if shift_quirks is None else shift_quirks
-        # Logic quirks should default to ON if arch > CHIP-8.
         self.logic_quirks = arch >= ARCH_SUPERCHIP_1_0 if logic_quirks is None else logic_quirks
-        # Index overflow quirks should always default to False.  Some Super-CHIP games fail if True.
         self.index_overflow_quirks = False if index_overflow_quirks is None else index_overflow_quirks
-        # Index increment quirks should default to False.  Set to True for CHIP-48 behaviour.
         self.index_increment_quirks = (
             (arch == ARCH_CHIP48) if index_increment_quirks is None else index_increment_quirks
         )
