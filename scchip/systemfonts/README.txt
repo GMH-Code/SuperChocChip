@@ -1,5 +1,5 @@
-CHIP-8 / Super-CHIP Font Files for CHIP-8 Emulator
-==================================================
+SuperChocChip Emulator CHIP-8 / Super-CHIP Font Files
+=====================================================
 
 These files contain bitmap fonts which are copied into RAM on emulator boot.
 Usually they are embedded into the source code (as hex data), but I have opted
