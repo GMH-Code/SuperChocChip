@@ -652,11 +652,9 @@ class CPU:
 
         val = self.v[self.vx]
         i = self.i
-        self.ram.write((i + 2) & self.i_bitmask, val % 10)  # Grab the last digit (e.g. the 4 from 254)
-        val //= 10
-        self.ram.write((i + 1) & self.i_bitmask, val % 10)  # Grab the middle digit (e.g. the 5 from 254)
-        val //= 10
-        self.ram.write(i, val)  # Grab the first digit.  We don't need a further modulo as the maximum is 2 (255 // 100)
+        self.ram.write(i, val // 100)                               # Most-significant digit
+        self.ram.write((i + 1) & self.i_bitmask, (val // 10) % 10)  # Middle digit
+        self.ram.write((i + 2) & self.i_bitmask, val % 10)          # Least-signifiant digit
 
     def _post_Fx55_Fx65(self):
         if not self.load_quirks:
