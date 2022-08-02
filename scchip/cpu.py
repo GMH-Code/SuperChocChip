@@ -53,12 +53,13 @@ class CPU:
             auto_clock_speed = clock_speed
 
         self.core_interval = None if auto_clock_speed <= 0 else 1.0 / auto_clock_speed
+        arch_is_schip = (arch >= ARCH_SUPERCHIP_1_0 and arch <= ARCH_SUPERCHIP_1_1)  # Includes CHIP-48
 
         """
         Quirks
         ------
 
-        - Load quirks           : Enabled on XO-CHIP and CHIP-8 systems.
+        - Load quirks           : Enabled on CHIP-8, Super-CHIP 1.1, and XO-CHIP systems only.
         - Shift quirks          : Enabled on Super-CHIP-based systems only.
         - Logic quirks          : Enabled on CHIP-8 systems only.
         - Index overflow quirks : Disabled.  Some Super-CHIP games fail if enabled.
@@ -66,8 +67,7 @@ class CPU:
         - Jump quirks           : Enabled on Super-CHIP-based systems only.
         """
 
-        arch_is_schip = (arch >= ARCH_SUPERCHIP_1_0 and arch <= ARCH_SUPERCHIP_1_1)  # Includes CHIP-48
-        self.load_quirks = (arch >= ARCH_XO_CHIP or arch == ARCH_CHIP8) if load_quirks is None else load_quirks
+        self.load_quirks = (arch >= ARCH_SUPERCHIP_1_1 or arch == ARCH_CHIP8) if load_quirks is None else load_quirks
         self.shift_quirks = arch_is_schip if shift_quirks is None else shift_quirks
         self.logic_quirks = (arch == ARCH_CHIP8) if logic_quirks is None else logic_quirks
         self.index_overflow_quirks = False if index_overflow_quirks is None else index_overflow_quirks
