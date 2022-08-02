@@ -534,9 +534,12 @@ class CPU:
             # A standard non-Super-CHIP sprite
             width = 8
 
+        # The sprite's start always wraps regardless of architecture.
+        # Bottom-right corners are trimmed in CHIP-8 or Super-CHIP.
+        vid_width, vid_height = self.framebuffer.get_vid_size()
+        vx_pos = self.v[self.vx] % vid_width
+        vy_pos = self.v[self.vy] % vid_height
         big_sprite = width > 8
-        vx_pos = self.v[self.vx]
-        vy_pos = self.v[self.vy]
         rows_collided = 0
         i = self.i
 

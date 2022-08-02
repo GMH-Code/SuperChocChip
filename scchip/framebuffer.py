@@ -191,6 +191,9 @@ class Framebuffer():
     def switch_planes(self, mask):
         self.affect_planes = self.mask_to_planes[mask]
 
+    def get_vid_size(self):
+        return self.vid_width, self.vid_height
+
     def report_perf(self, fps=0, ops=0):
         title = "{} - {} FPS, {} OPS".format(APP_NAME, fps, ops)
         self.renderer.set_title(title)

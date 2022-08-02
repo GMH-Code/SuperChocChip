@@ -82,8 +82,7 @@ def main(args):
     framebuffer = Framebuffer(
         renderer,
         num_planes=(2 if arch >= ARCH_XO_CHIP else 1),
-        allow_wrapping=((arch >= ARCH_SUPERCHIP_1_0) if screen_wrap_quirks is None else bool(
-            screen_wrap_quirks))  # XO-CHIP games usually need this set to True, CHIP-8 games need it at False
+        allow_wrapping=((arch >= ARCH_XO_CHIP) if screen_wrap_quirks is None else bool(screen_wrap_quirks))
     )
 
     # Set up host inputs, and link to the chosen rendering module in case it provides inputs too
