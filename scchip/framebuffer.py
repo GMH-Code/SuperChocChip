@@ -31,6 +31,10 @@ from .constants import APP_NAME
 from .ram import RAM
 
 
+class FramebufferError(Exception):
+    pass
+
+
 class Framebuffer():
     def __init__(self, renderer, num_planes=1, allow_wrapping=True):
         self.renderer = renderer
@@ -105,10 +109,11 @@ class Framebuffer():
     def _render_pixel(self, x, y):
         # Render the pixel to the display
         vram_loc = x + y * self.vid_width
-        colour = 1 if self.ram_banks[0].read(vram_loc) else 0
+        colour = 0
 
-        if self.num_planes > 1 and self.ram_banks[1].read(vram_loc):
-            colour += 2
+        for plane_num in range(self.num_planes):
+            if self.ram_banks[plane_num].read(vram_loc):
+                colour += 2 ** plane_num
 
         self.renderer.set_pixel(x, y, colour)
 
@@ -182,7 +187,10 @@ class Framebuffer():
         self.renderer.refresh_display()
 
     def switch_planes(self, mask):
-        self.affect_planes = self.mask_to_planes[mask]
+        self.affect_planes = self.mask_to_planes.get(mask)
+
+        if self.affect_planes is None:
+            raise FramebufferError("Selected display plane is out of range for this architecture")
 
     def get_vid_size(self):
         return self.vid_width, self.vid_height

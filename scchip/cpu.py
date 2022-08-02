@@ -839,9 +839,6 @@ class CPU:
         if self.live_debug:
             self.debug("XPLA {:01x}".format(self.vx))
 
-        if self.vx > 3:
-            self._opcode_unsupported()
-
         self.framebuffer.switch_planes(self.vx)
 
     def _Fx02(self):  # XSTA

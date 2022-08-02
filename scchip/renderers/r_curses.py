@@ -18,8 +18,8 @@ the characters.
 __copyright__ = "Copyright (C) 2022 Gregory Maynard-Hoare"
 __license__ = "GNU Affero General Public License v3.0"
 
-import _curses
 import curses
+import _curses
 from .r_null import Renderer as RendererBase
 
 
@@ -79,7 +79,7 @@ class Renderer(RendererBase):
 
     def set_pixel(self, x, y, colour):
         if self.use_colour:
-            curses_colour = curses.color_pair(colour + 1)
+            curses_colour = curses.color_pair((colour % 4) + 1)
         else:
             curses_colour = curses.A_REVERSE if colour else curses.A_NORMAL
 

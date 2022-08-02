@@ -5,7 +5,7 @@ __license__ = "GNU Affero General Public License v3.0"
 
 import unittest
 from scchip.renderers.r_null import Renderer
-from scchip.framebuffer import Framebuffer
+from scchip.framebuffer import Framebuffer, FramebufferError
 
 
 class TestFrameBuffer(unittest.TestCase):
@@ -29,7 +29,7 @@ class TestFrameBuffer(unittest.TestCase):
         self.assertEqual(1, len(fbm.get_affected_planes()))
         fbm.switch_planes(0b0)
         self.assertEqual(0, len(fbm.get_affected_planes()))
-        self.assertRaises(KeyError, fbm.switch_planes, 0b10)
+        self.assertRaises(FramebufferError, fbm.switch_planes, 0b10)
 
         fbc = self.framebuffer_col
         fbc.switch_planes(0b00)
@@ -40,7 +40,7 @@ class TestFrameBuffer(unittest.TestCase):
         self.assertEqual(1, len(fbc.get_affected_planes()))
         fbc.switch_planes(0b11)
         self.assertEqual(2, len(fbc.get_affected_planes()))
-        self.assertRaises(KeyError, fbc.switch_planes, 0b100)
+        self.assertRaises(FramebufferError, fbc.switch_planes, 0b100)
 
     def test_framebuffer_writes_mono(self):
         fb = self.framebuffer_mono

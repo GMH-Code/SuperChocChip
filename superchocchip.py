@@ -3,7 +3,7 @@
 __author__ = "Gregory Maynard-Hoare"
 __copyright__ = "Copyright (C) 2022 Gregory Maynard-Hoare"
 __license__ = "GNU Affero General Public License v3.0"
-__version__ = "1.0.3"
+__version__ = "1.1.0"
 
 from argparse import ArgumentParser
 from scchip import main
@@ -14,8 +14,9 @@ def parse_args():
     parser = ArgumentParser()
     parser.add_argument("filename", help="ROM to execute (normally ending in .ch8 or .c8)")
     parser.add_argument(
-        "-a", "--arch", choices=list(SUPPORTED_CPUS.keys()), default="xochip",
-        help="set CPU instructions, speed, and quirks automatically for CHIP-8, CHIP-48, Super-CHIP 1.0/1.1 or XO-CHIP"
+        "-a", "--arch", choices=list(SUPPORTED_CPUS.keys()), default="xochip16",
+        help="set CPU instructions, speed, and quirks automatically for CHIP-8, CHIP-48, Super-CHIP 1.0/1.1,"
+        + " XO-CHIP, or XO-CHIP 16-colour mode"
     )
     parser.add_argument(
         "-c", "--clock_speed", type=int,

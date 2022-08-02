@@ -4,7 +4,7 @@ __copyright__ = "Copyright (C) 2022 Gregory Maynard-Hoare"
 __license__ = "GNU Affero General Public License v3.0"
 
 import unittest
-from scchip.constants import ARCH_XO_CHIP, DEFAULT_KEYMAP
+from scchip.constants import ARCH_XO_CHIP_16, DEFAULT_KEYMAP
 from scchip.cpu import CPU, CPUError
 from scchip.debugger import Debugger
 from scchip.ram import RAM
@@ -22,9 +22,9 @@ class TestCPU(unittest.TestCase):
         self.ram.resize(0x10000)
         self.stack = Stack(16)
         renderer = Renderer(use_colour=True)
-        self.framebuffer = Framebuffer(renderer, num_planes=2)
+        self.framebuffer = Framebuffer(renderer, num_planes=4)
         self.cpu = CPU(
-            ARCH_XO_CHIP, self.ram, self.stack, self.framebuffer, Inputs(DEFAULT_KEYMAP, renderer), Debugger()
+            ARCH_XO_CHIP_16, self.ram, self.stack, self.framebuffer, Inputs(DEFAULT_KEYMAP, renderer), Debugger()
         )
         self.cpu.pc = 0x200
 
@@ -60,7 +60,7 @@ class TestCPU(unittest.TestCase):
 
     def test_cpu_decode_exec_fail(self):
         # Not checking Fx75/Fx85
-        for i in 0x0000, 0x0001, 0x5001, 0x8008, 0x800F, 0x9001, 0xE09F, 0xE0A2, 0xF100, 0xF401, 0xFFFF:
+        for i in 0x0000, 0x0001, 0x5001, 0x8008, 0x800F, 0x9001, 0xE09F, 0xE0A2, 0xF100, 0xFFFF:
             self._check_invalid_opcode_caught(i)
 
     def _check_opcode(self, opcode):
@@ -438,11 +438,9 @@ class TestCPU(unittest.TestCase):
         self.assertRaises(CPUError, self._check_opcode, 0xF100)
 
     def test_cpu_fn01(self):  # XPLA Vx
-        for opcode, plane_count in (0xF001, 0), (0xF101, 1), (0xF201, 1), (0xF301, 2):
+        for opcode, plane_count in (0xF001, 0), (0xF101, 1), (0xF201, 1), (0xF301, 2), (0xFF01, 4):
             self._check_opcode(opcode)
             self.assertEqual(plane_count, len(self.framebuffer.get_affected_planes()))
-
-        self.assertRaises(CPUError, self._check_opcode, 0xF401)
 
     def test_cpu_fx02(self):  # XSTA
         # Only F002 is valid, so check F102 throws exception

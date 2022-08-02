@@ -7,6 +7,7 @@ This emulator can run ROMs (machine code binaries, usually games) for all the fo
 - Super-CHIP 1.0
 - Super-CHIP 1.1
 - XO-CHIP
+- XO-CHIP -- Extended colours
 
 It is written from the ground up in Pure Python, runs on Linux (out of the box), or on Windows, and emulates a proper computer with CPU, keypad, display, etc., and can run, and play, native ROMs freely available on the Internet at 100% speed, even on older hosts.
 
@@ -42,15 +43,16 @@ Command-line Parameters
 -----------------------
 
     Usage:
-        superchocchip.py [-h] [-a {chip8,schip1.0,chip48,schip1.1,xochip}] [-c CLOCK_SPEED] [-r {pygame,curses,null}] [-s SCALE] [-m {0,1,2}] [-k KEYMAP] [--load_quirks {0,1}] [--shift_quirks {0,1}] [--logic_quirks {0,1}] [--index_overflow_quirks {0,1}] [--index_increment_quirks {0,1}] [--jump_quirks {0,1}] [--screen_wrap_quirks {0,1}] [-d] filename
+        superchocchip.py [-h] [-a {chip8,schip1.0,chip48,schip1.1,xochip,xochip16}] [-c CLOCK_SPEED] [-r {pygame,curses,null}] [-s SCALE] [-m {0,1,2}] [-k KEYMAP] [--load_quirks {0,1}] [--shift_quirks {0,1}] [--logic_quirks {0,1}] [--index_overflow_quirks {0,1}] [--index_increment_quirks {0,1}] [--jump_quirks {0,1}] [--screen_wrap_quirks {0,1}] [-d]
+        filename
     
     Positional arguments:
         filename              ROM to execute (normally ending in .ch8 or .c8)
     
     Optional arguments:
         -h, --help            show this help message and exit
-        -a {chip8,schip1.0,chip48,schip1.1,xochip}, --arch {chip8,schip1.0,chip48,schip1.1,xochip}
-                              set CPU instructions, speed, and quirks automatically for CHIP-8, CHIP-48, Super-CHIP 1.0/1.1 or XO-CHIP
+        -a {chip8,schip1.0,chip48,schip1.1,xochip,xochip16}, --arch {chip8,schip1.0,chip48,schip1.1,xochip,xochip16}
+                              set CPU instructions, speed, and quirks automatically for CHIP-8, CHIP-48, Super-CHIP 1.0/1.1, XO-CHIP, or XO-CHIP 16-colour mode
         -c CLOCK_SPEED, --clock_speed CLOCK_SPEED
                               override the CPU speed in operations/second, regardless of architecture (0=force uncapped)
         -r {pygame,curses,null}, --renderer {pygame,curses,null}
@@ -81,7 +83,7 @@ The CPU includes variants of:
 
 Depending on the hardware/modes chosen in the emulator, included is:
 - 4K / 64K system RAM with byte/block access and fast moves
-- 64x32 / 128x64 monochromatic/colour displays
+- 64x32 / 128x64 monochromatic, 4-colour / 16-colour displays
 - 256-byte / 1K video RAM
 - 12-level / 16-level 12-bit CPU call stacks
 - 16x 8-bit aligned system registers
@@ -99,7 +101,7 @@ Depending on the hardware/modes chosen in the emulator, included is:
 Supported Features
 ------------------
 
-- Large, small, and multi-plane (colour) sprites.  16-colour blended sprites are also possible and have been tested successfully in development.  I may include this when the specification is official.
+- Large, small, and colour sprites.  4-plane (16-colour) sprites are supported, even though the specification on this is unofficial.  These currently use shades of the other colours in the PyGame renderer.  In the Curses renderer, colours are reused.
 - Fast 4-way scrolling.
 - An extra video timer, which ensures unnecessary rendering and flickering doesn't occur.  Modern games which use the delay timer to provide VSync emulation are supported.
 - Performance monitoring output (frames drawn and instructions executed per second).
@@ -145,7 +147,6 @@ Future Expansion
 - Snapshots (save states) and saving/restoring of RPL registers to/from disk.  I'm not so bothered about this at the moment, but some games, such as RPGs, are becoming longer to play, so saving your progress would be good to have.
 - Per-game configuration of palette and quirks, at least.
 - Audio output, despite the fact I'll probably end up muting it anyway.
-- Proper 16 colour support, when the specifications on it are chosen.
 
 Extending
 ---------

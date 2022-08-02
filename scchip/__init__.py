@@ -13,7 +13,7 @@ __copyright__ = "Copyright (C) 2022 Gregory Maynard-Hoare"
 __license__ = "GNU Affero General Public License v3.0"
 
 from .constants import (
-    APP_INTRO, APP_COPYRIGHT, ARCH_CHIP8, ARCH_SUPERCHIP_1_0, ARCH_XO_CHIP, SUPPORTED_CPUS, CPU_QUIRKS
+    APP_INTRO, APP_COPYRIGHT, ARCH_CHIP8, ARCH_SUPERCHIP_1_0, ARCH_XO_CHIP, ARCH_XO_CHIP_16, SUPPORTED_CPUS, CPU_QUIRKS
 )
 from .cpu import CPU
 from .debugger import Debugger
@@ -79,9 +79,18 @@ def main(args):
 
     # Initialise framebuffer and attach to rendering system
     screen_wrap_quirks = args["screen_wrap_quirks"]
+
+    # Choose number of planes appropriate to system architecture
+    if arch >= ARCH_XO_CHIP_16:
+        num_planes = 4
+    elif arch >= ARCH_XO_CHIP:
+        num_planes = 2
+    else:
+        num_planes = 1
+
     framebuffer = Framebuffer(
         renderer,
-        num_planes=(2 if arch >= ARCH_XO_CHIP else 1),
+        num_planes=num_planes,
         allow_wrapping=((arch >= ARCH_XO_CHIP) if screen_wrap_quirks is None else bool(screen_wrap_quirks))
     )
 

@@ -5,7 +5,7 @@ __license__ = "GNU Affero General Public License v3.0"
 
 # App identification
 APP_NAME = "SuperChocChip Emulator"
-APP_VERSION = "1.0.3"
+APP_VERSION = "1.1.0"
 APP_COPYRIGHT = "Copyright (C) 2022 Gregory Maynard-Hoare, licensed under GNU Affero General Public License v3.0"
 APP_INTRO = "{} V{} -- ".format(APP_NAME, APP_VERSION)
 
@@ -15,6 +15,7 @@ ARCH_SUPERCHIP_1_0 = 10
 ARCH_CHIP48 = 15  # Chip-48 came before Super-CHIP 1.0, but it's mostly the same, just with quirks
 ARCH_SUPERCHIP_1_1 = 20
 ARCH_XO_CHIP = 30
+ARCH_XO_CHIP_16 = 35
 
 # Default mappings for keys 0-F, later populated into a dictionary.  Note that the keyscans (on a UK QWERTY keyboard)
 # and ASCII characters for these are the same code
@@ -26,7 +27,8 @@ SUPPORTED_CPUS = {
     "schip1.0":     ARCH_SUPERCHIP_1_0,  # Extra instructions, additional storage registers, high res mode, etc
     "chip48":       ARCH_CHIP48,         # Super-CHIP 1.0 with different default quirk flags
     "schip1.1":     ARCH_SUPERCHIP_1_1,  # Hardware scrolling, large system font
-    "xochip":       ARCH_XO_CHIP         # Colour screen, 64K extended memory, etc
+    "xochip":       ARCH_XO_CHIP,        # Colour screen, 64K extended memory, etc
+    "xochip16":     ARCH_XO_CHIP_16      # XO-CHIP with 16-colour (4-plane) support
 }
 
 # CPU quirks (not including display wrapping)
