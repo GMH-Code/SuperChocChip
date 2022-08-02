@@ -101,7 +101,7 @@ Depending on the hardware/modes chosen in the emulator, included is:
 Supported Features
 ------------------
 
-- Large, small, and colour sprites.  4-plane (16-colour) sprites are supported, even though the specification on this is unofficial.  These currently use shades of the other colours in the PyGame renderer.  In the Curses renderer, colours are reused.
+- Large, small, and colour sprites.  4-plane (16-colour) sprites are supported, even though the specification on this is unofficial.  These currently use shades of the other colours in the PyGame renderer.  In the Curses renderer, 8 colours are defined, and some are reused.
 - Fast 4-way scrolling.
 - An extra video timer, which ensures unnecessary rendering and flickering doesn't occur.  Modern games which use the delay timer to provide VSync emulation are supported.
 - Performance monitoring output (frames drawn and instructions executed per second).

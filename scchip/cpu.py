@@ -837,7 +837,7 @@ class CPU:
 
     def _Fn01(self):  # XPLA Vx
         if self.live_debug:
-            self.debug("XPLA {:01x}".format(self.vx))
+            self.debug("XPLA 0x{:01x}".format(self.vx))
 
         self.framebuffer.switch_planes(self.vx)
 

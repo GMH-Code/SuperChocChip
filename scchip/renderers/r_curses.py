@@ -45,6 +45,10 @@ class Renderer(RendererBase):
             curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_GREEN)
             curses.init_pair(3, curses.COLOR_BLACK, curses.COLOR_RED)
             curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_WHITE)
+            curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_BLUE)
+            curses.init_pair(6, curses.COLOR_BLACK, curses.COLOR_CYAN)
+            curses.init_pair(7, curses.COLOR_BLACK, curses.COLOR_MAGENTA)
+            curses.init_pair(8, curses.COLOR_BLACK, curses.COLOR_YELLOW)
 
         super().__init__(scale, use_colour)
 
@@ -79,7 +83,7 @@ class Renderer(RendererBase):
 
     def set_pixel(self, x, y, colour):
         if self.use_colour:
-            curses_colour = curses.color_pair((colour % 4) + 1)
+            curses_colour = curses.color_pair((colour % 8) + 1)
         else:
             curses_colour = curses.A_REVERSE if colour else curses.A_NORMAL
 
