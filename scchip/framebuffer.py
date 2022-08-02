@@ -31,15 +31,8 @@ from .constants import APP_NAME
 from .ram import RAM
 
 
-class FramebufferError(Exception):
-    pass
-
-
 class Framebuffer():
     def __init__(self, renderer, num_planes=1, allow_wrapping=True):
-        if num_planes > 2 or num_planes < 1:
-            raise FramebufferError("The framebuffer only supports 1 or 2 planes of VRAM.")
-
         self.renderer = renderer
         self.num_planes = num_planes
         self.allow_wrapping = allow_wrapping
@@ -52,17 +45,17 @@ class Framebuffer():
         for _ in range(num_planes):
             self.ram_banks.append(RAM())
 
-        # Set up plane for monochrome display -- white (or green for colour displays)
-        self.mask_to_planes = {1: [self.ram_banks[0]]}
-        self.affect_planes = self.mask_to_planes[1]
+        # Map all the masks into matching planes for fast lookup
+        self.mask_to_planes = {}
 
-        if num_planes == 2:
-            # Add plane for colour display
-            self.mask_to_planes.update({
-                0: [],                                     # Drop draw request
-                2: [self.ram_banks[1]],                    # Red by default
-                3: [self.ram_banks[0], self.ram_banks[1]]  # White by default
-            })
+        for mask in range(2 ** num_planes):
+            self.mask_to_planes[mask] = []
+
+            for plane_num in range(num_planes):
+                if mask & 2 ** plane_num:
+                    self.mask_to_planes[mask].append(self.ram_banks[plane_num])
+
+        self.affect_planes = self.mask_to_planes[1]
 
     def resize_vid(self, vid_width, vid_height):
         self.vid_width = vid_width

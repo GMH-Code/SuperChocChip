@@ -5,7 +5,7 @@ __license__ = "GNU Affero General Public License v3.0"
 
 import unittest
 from scchip.renderers.r_null import Renderer
-from scchip.framebuffer import Framebuffer, FramebufferError
+from scchip.framebuffer import Framebuffer
 
 
 class TestFrameBuffer(unittest.TestCase):
@@ -17,10 +17,6 @@ class TestFrameBuffer(unittest.TestCase):
         self.framebuffer_mono.resize_vid(4, 5)
         self.framebuffer_col.resize_vid(3, 4)
 
-    def test_framebuffer_init(self):
-        for num_planes in [0, 3]:
-            self.assertRaises(FramebufferError, Framebuffer, Renderer, num_planes)
-
     def test_framebuffer_resize_vid(self):
         self.assertEqual(1, len(self.framebuffer_mono.ram_banks))
         self.assertEqual(2, len(self.framebuffer_col.ram_banks))
@@ -29,9 +25,11 @@ class TestFrameBuffer(unittest.TestCase):
 
     def test_framebuffer_plane_control(self):
         fbm = self.framebuffer_mono
-        self.framebuffer_mono.switch_planes(0b01)
+        fbm.switch_planes(0b1)
         self.assertEqual(1, len(fbm.get_affected_planes()))
-        self.assertRaises(KeyError, fbm.switch_planes, 0b00)
+        fbm.switch_planes(0b0)
+        self.assertEqual(0, len(fbm.get_affected_planes()))
+        self.assertRaises(KeyError, fbm.switch_planes, 0b10)
 
         fbc = self.framebuffer_col
         fbc.switch_planes(0b00)
@@ -42,6 +40,7 @@ class TestFrameBuffer(unittest.TestCase):
         self.assertEqual(1, len(fbc.get_affected_planes()))
         fbc.switch_planes(0b11)
         self.assertEqual(2, len(fbc.get_affected_planes()))
+        self.assertRaises(KeyError, fbc.switch_planes, 0b100)
 
     def test_framebuffer_writes_mono(self):
         fb = self.framebuffer_mono
