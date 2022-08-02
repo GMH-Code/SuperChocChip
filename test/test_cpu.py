@@ -181,18 +181,18 @@ class TestCPU(unittest.TestCase):
         self.assertEqual(0x0, self.cpu.v[0xF])
 
     def test_cpu_8xy6_borrow(self):  # SHR Vx {, Vy}
-        self.cpu.v[0x1] = 0x1
-        self.cpu.v[0x2] = 0x4  # Use Vf as an input to check flag ordering too
-        self._check_opcode(0x8146)
+        self.cpu.v[0x1] = 0x4
+        self.cpu.v[0x2] = 0x1  # Use Vf as an input to check flag ordering too
+        self._check_opcode(0x8126)
         self.assertEqual(0x0, self.cpu.v[0x1])
-        self.assertEqual(0x4, self.cpu.v[0x2])
+        self.assertEqual(0x1, self.cpu.v[0x2])
         self.assertEqual(0x1, self.cpu.v[0xF])
 
     def test_cpu_8xy6_no_borrow(self):  # SHR Vx {, Vy}
-        self.cpu.v[0x1] = 0x1
-        self.cpu.v[0x2] = 0x2
-        self._check_opcode(0x8416)
-        self.assertEqual(0x1, self.cpu.v[0x1])
+        self.cpu.v[0x1] = 0x4
+        self.cpu.v[0x2] = 0x1
+        self._check_opcode(0x8216)
+        self.assertEqual(0x4, self.cpu.v[0x1])
         self.assertEqual(0x2, self.cpu.v[0x2])
         self.assertEqual(0x0, self.cpu.v[0xF])
 
@@ -207,18 +207,18 @@ class TestCPU(unittest.TestCase):
     def test_cpu_8xye_carry(self):  # SHL Vx {, Vy}
         self.cpu.v[0x1] = 0x4
         self.cpu.v[0x2] = 0x2
-        self._check_opcode(0x814E)
-        self.assertEqual(0x8, self.cpu.v[0x1])
+        self._check_opcode(0x812E)
+        self.assertEqual(0x4, self.cpu.v[0x1])
         self.assertEqual(0x2, self.cpu.v[0x2])
         self.assertEqual(0x0, self.cpu.v[0xF])
 
     def test_cpu_8xye_no_carry(self):  # SHL Vx {, Vy}
         self.cpu.v[0x1] = 0xFE
-        self.cpu.v[0x2] = 0x1
+        self.cpu.v[0x4] = 0x1
         self._check_opcode(0x814E)
-        self.assertEqual(0xFC, self.cpu.v[0x1])
-        self.assertEqual(0x1, self.cpu.v[0x2])
-        self.assertEqual(0x1, self.cpu.v[0xF])
+        self.assertEqual(0x2, self.cpu.v[0x1])
+        self.assertEqual(0x1, self.cpu.v[0x4])
+        self.assertEqual(0x0, self.cpu.v[0xF])
 
     def test_cpu_9xy0(self):  # SNE Vx, Vy
         self.cpu.v[0x2] = 0x15
@@ -458,9 +458,9 @@ class TestCPU(unittest.TestCase):
 
     def test_cpu_logic_quirks(self):
         for logic_quirks in False, True:
-            self.cpu.v[0xF] = 1
+            self.cpu.v[0xF] = 0x2
             self.cpu.logic_quirks = logic_quirks
 
             for i in range(4):
                 self._check_opcode(0x8120 + i)
-                self.assertEqual(int(logic_quirks), self.cpu.v[0xF])
+                self.assertEqual(int(not logic_quirks) * 2, self.cpu.v[0xF])

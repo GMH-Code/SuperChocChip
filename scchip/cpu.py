@@ -17,7 +17,7 @@ __license__ = "GNU Affero General Public License v3.0"
 from time import time
 from random import randint
 from math import ceil
-from .constants import APP_INTRO, ARCH_SUPERCHIP_1_0, ARCH_CHIP48, ARCH_SUPERCHIP_1_1, ARCH_XO_CHIP
+from .constants import APP_INTRO, ARCH_CHIP8, ARCH_SUPERCHIP_1_0, ARCH_CHIP48, ARCH_SUPERCHIP_1_1, ARCH_XO_CHIP
 
 CPU_ENDIAN = "big"   # CHIP-8 is big-endian
 TIMER_FREQ = 60.0    # 60Hz emulated system timer refresh
@@ -47,7 +47,7 @@ class CPU:
 
         if clock_speed is None:
             # Default clock speed
-            auto_clock_speed = 0 if arch >= ARCH_XO_CHIP else 1000
+            auto_clock_speed = 0 if arch >= ARCH_SUPERCHIP_1_0 else 1000
         else:
             # User-specified clock speed (user can specify 0 for infinite)
             auto_clock_speed = clock_speed
@@ -58,23 +58,23 @@ class CPU:
         Quirks
         ------
 
-        - Load quirks should default to enabled if emulating Super-CHIP 1.1, or above, but not below that.
-        - Shift quirks should always default to enabled.  Some say this should only be set if emulating beyond CHIP-8,
-          but that breaks too many games in regular CHIP-8 mode.
-        - Logic quirks should be enabled if emulating Super-CHIP 1.0, CHIP-48, or above.
-        - Index overflow quirks should be disabled by default.  Some Super-CHIP games fail if enabled.
-        - Index increment quirks should be disabled by default, but enable for accurate CHIP-48 behaviour.
-        - Jump quirks should be disabled by default, unless emulating CHIP-48 (only).
+        - Load quirks           : Enabled on XO-CHIP and CHIP-8 systems.
+        - Shift quirks          : Enabled on Super-CHIP-based systems only.
+        - Logic quirks          : Enabled on CHIP-8 systems only.
+        - Index overflow quirks : Disabled.  Some Super-CHIP games fail if enabled.
+        - Index increment quirks: Enabled for accurate CHIP-48 behaviour only.
+        - Jump quirks           : Enabled on Super-CHIP-based systems only.
         """
 
-        self.load_quirks = arch >= ARCH_SUPERCHIP_1_1 if load_quirks is None else load_quirks
-        self.shift_quirks = True if shift_quirks is None else shift_quirks
-        self.logic_quirks = arch >= ARCH_SUPERCHIP_1_0 if logic_quirks is None else logic_quirks
+        arch_is_schip = (arch >= ARCH_SUPERCHIP_1_0 and arch <= ARCH_SUPERCHIP_1_1)  # Includes CHIP-48
+        self.load_quirks = (arch >= ARCH_XO_CHIP or arch == ARCH_CHIP8) if load_quirks is None else load_quirks
+        self.shift_quirks = arch_is_schip if shift_quirks is None else shift_quirks
+        self.logic_quirks = (arch == ARCH_CHIP8) if logic_quirks is None else logic_quirks
         self.index_overflow_quirks = False if index_overflow_quirks is None else index_overflow_quirks
         self.index_increment_quirks = (
             (arch == ARCH_CHIP48) if index_increment_quirks is None else index_increment_quirks
         )
-        self.jump_quirks = (arch == ARCH_CHIP48) if jump_quirks is None else jump_quirks  # OFF by default
+        self.jump_quirks = arch_is_schip if jump_quirks is None else jump_quirks
 
         # Define instruction pointers.
         # n = Nibble
@@ -403,10 +403,10 @@ class CPU:
         self.v[vx] = byte & 0xFF
 
     def _post_8xy0_8xy1_8xy2_8xy3(self):
-        if not self.logic_quirks:
+        if self.logic_quirks:
             self.v[0xF] = 0
 
-    # All 8 instructions set VF on original CHIP-8
+    # All 8 instructions set Vf on original CHIP-8
     def _8xy0(self):  # LD Vx, Vy
         if self.live_debug:
             self.debug("LD V{:01x}, V{:01x}".format(self.vx, self.vy))
@@ -459,7 +459,7 @@ class CPU:
         self._post_8xy5_8xy7(self.v[self.vx] - self.v[self.vy])
 
     def _8xy6(self):  # SHR Vx {, Vy}
-        # On original CHIP-8, Vy is used.  On Super-CHIP 1.0 and above, Vx is used
+        # On Super-CHIP, Vx is used.  On CHIP-8 and XO-CHIP, Vy is used.
         vr = self.vx if self.shift_quirks else self.vy
 
         if self.live_debug:
@@ -476,7 +476,7 @@ class CPU:
         self._post_8xy5_8xy7(self.v[self.vy] - self.v[self.vx])
 
     def _8xyE(self):  # SHL Vx {, Vy}
-        # On original CHIP-8, Vy is used.  On Super-CHIP 1.0 and above, Vx is used
+        # On Super-CHIP, Vx is used.  On CHIP-8 and XO-CHIP, Vy is used.
         vr = self.vx if self.shift_quirks else self.vy
 
         if self.live_debug:
@@ -661,7 +661,7 @@ class CPU:
         self.ram.write((i + 2) & self.i_bitmask, val % 10)          # Least-signifiant digit
 
     def _post_Fx55_Fx65(self):
-        if not self.load_quirks:
+        if self.load_quirks:
             self.i += self.vx
 
             if not self.index_increment_quirks:
