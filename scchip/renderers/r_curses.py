@@ -24,7 +24,7 @@ from .r_null import Renderer as RendererBase
 
 
 class Renderer(RendererBase):
-    def __init__(self, scale=None, use_colour=True):
+    def __init__(self, scale=None, use_colour=True, **kwargs):
         if scale is None:
             scale = 2  # Default horizontal stretch if not supplied, or set to default
 
@@ -42,13 +42,13 @@ class Renderer(RendererBase):
             curses.start_color()  # Only needed if not B/W
             curses.use_default_colors()
             curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
-            curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_GREEN)
-            curses.init_pair(3, curses.COLOR_BLACK, curses.COLOR_RED)
-            curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_WHITE)
-            curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_BLUE)
-            curses.init_pair(6, curses.COLOR_BLACK, curses.COLOR_CYAN)
-            curses.init_pair(7, curses.COLOR_BLACK, curses.COLOR_MAGENTA)
-            curses.init_pair(8, curses.COLOR_BLACK, curses.COLOR_YELLOW)
+            curses_cols = [
+                curses.COLOR_GREEN, curses.COLOR_RED, curses.COLOR_WHITE, curses.COLOR_BLUE, curses.COLOR_CYAN,
+                curses.COLOR_MAGENTA, curses.COLOR_YELLOW
+            ]
+
+            for curses_col_num, curses_col in enumerate(curses_cols):
+                curses.init_pair(curses_col_num + 2, curses.COLOR_BLACK, curses_col)
 
         super().__init__(scale, use_colour)
 

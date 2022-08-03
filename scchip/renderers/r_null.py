@@ -13,8 +13,12 @@ __copyright__ = "Copyright (C) 2022 Gregory Maynard-Hoare"
 __license__ = "GNU Affero General Public License v3.0"
 
 
+class RendererError(Exception):
+    pass
+
+
 class Renderer:
-    def __init__(self, scale=None, use_colour=True):
+    def __init__(self, scale=None, use_colour=True, **kwargs):
         self.scale = 1 if scale is None else scale
         self.use_colour = use_colour
         self.set_resolution(0, 0)

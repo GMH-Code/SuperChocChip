@@ -43,12 +43,12 @@ Command-line Parameters
 -----------------------
 
     Usage:
-        superchocchip.py [-h] [-a {chip8,schip1.0,chip48,schip1.1,xochip,xochip16}] [-c CLOCK_SPEED] [-r {pygame,curses,null}] [-s SCALE] [-m {0,1,2}] [-k KEYMAP] [--load_quirks {0,1}] [--shift_quirks {0,1}] [--logic_quirks {0,1}] [--index_overflow_quirks {0,1}] [--index_increment_quirks {0,1}] [--jump_quirks {0,1}] [--screen_wrap_quirks {0,1}] [-d]
+        superchocchip.py [-h] [-a {chip8,schip1.0,chip48,schip1.1,xochip,xochip16}] [-c CLOCK_SPEED] [-r {pygame,curses,null}] [-s SCALE] [-m {0,1,2}] [-k KEYMAP] [--pygame_palette PYGAME_PALETTE] [--load_quirks {0,1}] [--shift_quirks {0,1}] [--logic_quirks {0,1}] [--index_overflow_quirks {0,1}] [--index_increment_quirks {0,1}] [--jump_quirks {0,1}] [--screen_wrap_quirks {0,1}] [-d]
         filename
-    
+
     Positional arguments:
         filename              ROM to execute (normally ending in .ch8 or .c8)
-    
+
     Optional arguments:
         -h, --help            show this help message and exit
         -a {chip8,schip1.0,chip48,schip1.1,xochip,xochip16}, --arch {chip8,schip1.0,chip48,schip1.1,xochip,xochip16}
@@ -63,6 +63,8 @@ Command-line Parameters
                               control cursor visibility in the Curses renderer
         -k KEYMAP, --keymap KEYMAP
                               redefine the 16 keyscan codes (PyGame) or character numbers (Curses). Separate each decimal with a comma
+        --pygame_palette PYGAME_PALETTE
+                              redefine up to 16 colours for the PyGame renderer in comma-separated hex, e.g. 1234ABCD,F987654E,.. etc.
         --load_quirks {0,1}   Manually disable or enable CPU load quirks.
         --shift_quirks {0,1}  Manually disable or enable CPU shift quirks.
         --logic_quirks {0,1}  Manually disable or enable CPU logic quirks.
@@ -109,6 +111,7 @@ Supported Features
 - Rendering deltas are done efficiently and limited to 60Hz.
 - The input and rendering modules can be swapped for your own creations.  In theory, you can make a game run on almost any custom display and keypad.
 - Custom-built CHIP-8 and Super-CHIP system fonts, with all characters drawable.
+- Redefinable palette.  This is currently only available in the PyGame renderer, not Curses.
 
 Notes
 -----
@@ -145,7 +148,7 @@ Future Expansion
 - Ideally, we should have 100% testing coverage across the board.
 - The test ROMs could be automatically validated as part of the tests, which would be nice.  This will require halting the CPU after a specified number of cycles and then verifying a SHA checksum of the Framebuffer VRAM banks against an expected value.
 - Snapshots (save states) and saving/restoring of RPL registers to/from disk.  I'm not so bothered about this at the moment, but some games, such as RPGs, are becoming longer to play, so saving your progress would be good to have.
-- Per-game configuration of palette and quirks, at least.
+- Per-game saved configuration of palette and quirks, at least.
 - Audio output, despite the fact I'll probably end up muting it anyway.
 
 Extending

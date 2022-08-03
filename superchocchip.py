@@ -3,7 +3,7 @@
 __author__ = "Gregory Maynard-Hoare"
 __copyright__ = "Copyright (C) 2022 Gregory Maynard-Hoare"
 __license__ = "GNU Affero General Public License v3.0"
-__version__ = "1.1.1"
+__version__ = "1.1.3"
 
 from argparse import ArgumentParser
 from scchip import main
@@ -37,6 +37,10 @@ def parse_args():
     parser.add_argument(
         "-k", "--keymap", default=DEFAULT_KEYMAP,
         help="redefine the 16 keyscan codes (PyGame) or character numbers (Curses).  Separate each decimal with a comma"
+    )
+    parser.add_argument(
+        "--pygame_palette",
+        help="redefine up to 16 colours for the PyGame renderer in comma-separated hex, e.g. 1234ABCD,F987654E,.. etc."
     )
 
     for cpu_quirk in CPU_QUIRKS:

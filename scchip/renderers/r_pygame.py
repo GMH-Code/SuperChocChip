@@ -19,11 +19,11 @@ __copyright__ = "Copyright (C) 2022 Gregory Maynard-Hoare"
 __license__ = "GNU Affero General Public License v3.0"
 
 import pygame
-from .r_null import Renderer as RendererBase
+from .r_null import RendererError, Renderer as RendererBase
 
 
 class Renderer(RendererBase):
-    def __init__(self, scale=None, use_colour=True):
+    def __init__(self, scale=None, use_colour=True, pygame_palette=None):
         if scale is None:
             scale = 512  # Default window width if not supplied, or set to default
 
@@ -44,6 +44,21 @@ class Renderer(RendererBase):
             self.colour_map = {1: 0xE0E0E0}
 
         self.colour_map[0] = 0x202020
+
+        # Override some (or all) of the colours with a user-defined palette, if necessary
+        if pygame_palette is not None:
+            for pygame_colour_num, pygame_colour in enumerate(pygame_palette.split(",")):
+                if pygame_colour_num > 0xF:
+                    raise RendererError("Too many palette colours defined.")
+
+                if len(pygame_colour) != 6:
+                    raise RendererError("Palette colours must all be 6 hex digits long.")
+
+                try:
+                    self.colour_map[pygame_colour_num] = int(pygame_colour, 16)
+                except ValueError:
+                    raise RendererError("Invalid palette colour defined.") from None
+
         super().__init__(scale, use_colour)
 
     def set_resolution(self, width, height):
