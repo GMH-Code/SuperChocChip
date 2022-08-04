@@ -28,31 +28,49 @@ class Inputs(InputsBase):
         for i in range(0x10):
             self.key_down[i] = False
 
+        self.pygame_methods = {
+            pygame.QUIT:    self._pygame_quit,
+            pygame.KEYDOWN: self._pygame_keydown,
+            pygame.KEYUP:   self._pygame_keyup
+        }
+
         super().__init__(keymap, renderer)
 
     def __del__(self):
         pygame.quit()
 
     def process_messages(self):
+        # Call PyGame method based on fast dictionary lookup of event
+        quit_program = False
+
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return True
+            pygame_method = self.pygame_methods.get(event.type)
 
-            if event.type == pygame.KEYDOWN:
-                hex_key = self.keymap_dict.get(event.key)
+            if pygame_method and pygame_method(event):  # Check via short circuit that we don't have 'None'
+                quit_program = True  # Process more events, even if planning to quit
 
-                if hex_key is not None:
-                    self.key_down[hex_key] = True
+        return quit_program
 
-            elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_ESCAPE:
-                    return True
+    def _pygame_quit(self, _):
+        return True
 
-                hex_key = self.keymap_dict.get(event.key)
+    def _pygame_keydown(self, event):
+        hex_key = self.keymap_dict.get(event.key)
 
-                if hex_key is not None and self.key_down[hex_key]:
-                    self.key_down[hex_key] = False
-                    self.last_keypress = hex_key
+        if hex_key is not None:
+            self.key_down[hex_key] = True
+
+        return False
+
+    def _pygame_keyup(self, event):
+        if event.key == pygame.K_ESCAPE:
+            return True
+
+        hex_key = self.keymap_dict.get(event.key)
+
+        if hex_key is not None and self.key_down[hex_key]:
+            self.key_down[hex_key] = False
+            self.last_keypress = hex_key
 
         return False
 
