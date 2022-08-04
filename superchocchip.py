@@ -3,7 +3,7 @@
 __author__ = "Gregory Maynard-Hoare"
 __copyright__ = "Copyright (C) 2022 Gregory Maynard-Hoare"
 __license__ = "GNU Affero General Public License v3.0"
-__version__ = "1.1.4"
+__version__ = "1.1.5"
 
 from argparse import ArgumentParser
 from scchip import main
@@ -29,6 +29,10 @@ def parse_args():
     parser.add_argument(
         "-s", "--scale", type=int,
         help="set the window width in PyGame mode (default 512), and scale in Curses mode (default 2)"
+    )
+    parser.add_argument(
+        "-f", "--smoothing", type=int, default=0,
+        help="define the number of smoothing filter passes for higher quality rendering (default 0)"
     )
     parser.add_argument(
         "-m", "--curses_cursor_mode", type=int, choices=[0, 1, 2], default=0,

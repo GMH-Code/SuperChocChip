@@ -23,7 +23,7 @@ from .r_null import RendererError, Renderer as RendererBase
 
 
 class Renderer(RendererBase):
-    def __init__(self, scale=None, use_colour=True, pygame_palette=None, **kwargs):
+    def __init__(self, scale=None, use_colour=True, pygame_palette=None, smoothing=0, **kwargs):
         if scale is None:
             scale = 512  # Default window width if not supplied, or set to default
 
@@ -32,6 +32,7 @@ class Renderer(RendererBase):
         self.pixel_array = None
         self.scaled_size = (scale, scale // 2)
         self.display_surface = pygame.display.set_mode(self.scaled_size, 0, 8)
+        self.smoothing = smoothing
 
         if use_colour:
             self.colour_map = {
@@ -77,7 +78,13 @@ class Renderer(RendererBase):
         if self.refresh_needed and self.pixel_array:
             self.pixel_array.close()
             del self.pixel_array
-            scaled_win = pygame.transform.scale(self.render_surface, self.scaled_size)
+            render_surface = self.render_surface
+
+            # Apply Scale2x rendering passes if requested
+            for _ in range(self.smoothing):
+                render_surface = pygame.transform.scale2x(render_surface)
+
+            scaled_win = pygame.transform.scale(render_surface, self.scaled_size)
             self.display_surface.blit(scaled_win, (0, 0))
             pygame.display.flip()
             self._set_pixel_array()

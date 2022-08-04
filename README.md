@@ -43,7 +43,7 @@ Command-line Parameters
 -----------------------
 
     Usage:
-        superchocchip.py [-h] [-a {chip8,schip1.0,chip48,schip1.1,xochip,xochip16}] [-c CLOCK_SPEED] [-r {pygame,curses,null}] [-s SCALE] [-m {0,1,2}] [-k KEYMAP] [--pygame_palette PYGAME_PALETTE] [--curses_palette CURSES_PALETTE] [--load_quirks {0,1}] [--shift_quirks {0,1}] [--logic_quirks {0,1}] [--index_overflow_quirks {0,1}] [--index_increment_quirks {0,1}] [--jump_quirks {0,1}] [--screen_wrap_quirks {0,1}] [-d]
+        superchocchip.py [-h] [-a {chip8,schip1.0,chip48,schip1.1,xochip,xochip16}] [-c CLOCK_SPEED] [-r {pygame,curses,null}] [-s SCALE] [-f SMOOTHING] [-m {0,1,2}] [-k KEYMAP] [--pygame_palette PYGAME_PALETTE] [--curses_palette CURSES_PALETTE] [--load_quirks {0,1}] [--shift_quirks {0,1}] [--logic_quirks {0,1}] [--index_overflow_quirks {0,1}] [--index_increment_quirks {0,1}] [--jump_quirks {0,1}] [--screen_wrap_quirks {0,1}] [-d]
         filename
 
     Positional arguments:
@@ -59,6 +59,8 @@ Command-line Parameters
                               set the rendering and input systems (pygame by default if available, otherwise curses)
         -s SCALE, --scale SCALE
                               set the window width in PyGame mode (default 512), and scale in Curses mode (default 2)
+        -f SMOOTHING, --smoothing SMOOTHING
+                              define the number of smoothing filter passes for higher quality rendering (default 0)
         -m {0,1,2}, --curses_cursor_mode {0,1,2}
                               control cursor visibility in the Curses renderer
         -k KEYMAP, --keymap KEYMAP
@@ -114,6 +116,7 @@ Supported Features
 - The input and rendering modules can be swapped for your own creations.  In theory, you can make a game run on almost any custom display and keypad.
 - Custom-built CHIP-8 and Super-CHIP system fonts, with all characters drawable.
 - Redefinable palettes, in both PyGame and Curses renderers.
+- Scale2x (high quality) smoothing in the PyGame renderer, off by default.
 
 Notes
 -----

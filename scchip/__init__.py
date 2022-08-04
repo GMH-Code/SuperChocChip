@@ -75,7 +75,8 @@ def main(args):
         scale=args["scale"],
         use_colour=(arch >= ARCH_XO_CHIP),
         pygame_palette=args["pygame_palette"],
-        curses_palette=args["curses_palette"]
+        curses_palette=args["curses_palette"],
+        smoothing=args["smoothing"]
     )
 
     # If the user is interested in seeing the cursor in Curses mode, show it
