@@ -47,10 +47,12 @@ class Renderer(RendererBase):
 
         # Override some (or all) of the colours with a user-defined palette, if necessary
         if pygame_palette is not None:
-            for pygame_colour_num, pygame_colour in enumerate(pygame_palette.split(",")):
-                if pygame_colour_num > 0xF:
-                    raise RendererError("Too many palette colours defined.")
+            pygame_palette_split = pygame_palette.split(",")
 
+            if len(pygame_palette_split) > 0x10:
+                raise RendererError("Too many palette colours defined.")
+
+            for pygame_colour_num, pygame_colour in enumerate(pygame_palette_split):
                 if len(pygame_colour) != 6:
                     raise RendererError("Palette colours must all be 6 hex digits long.")
 

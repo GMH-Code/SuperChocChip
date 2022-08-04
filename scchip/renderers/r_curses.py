@@ -58,7 +58,7 @@ class Renderer(RendererBase):
 
             # Override some (or all) of the colours with a user-defined palette, if necessary
             if curses_palette is not None:
-                if len(curses_palette) > 0xF:
+                if len(curses_palette) > 0x10:
                     raise RendererError("Too many palette colours defined.")
 
                 for curses_colour_num, curses_colour in enumerate(curses_palette):
