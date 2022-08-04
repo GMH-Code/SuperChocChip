@@ -20,11 +20,11 @@ __license__ = "GNU Affero General Public License v3.0"
 
 import curses
 import _curses
-from .r_null import Renderer as RendererBase
+from .r_null import RendererError, Renderer as RendererBase
 
 
 class Renderer(RendererBase):
-    def __init__(self, scale=None, use_colour=True, **kwargs):
+    def __init__(self, scale=None, use_colour=True, curses_palette=None, **kwargs):
         if scale is None:
             scale = 2  # Default horizontal stretch if not supplied, or set to default
 
@@ -33,22 +33,41 @@ class Renderer(RendererBase):
         self.last_screen_height = -1
         self.last_screen_width = -1
         self.cursor_mode = 0
+        self.palette_index = None
         self.screen = curses.initscr()
         curses.curs_set(self.cursor_mode)
         curses.noecho()
         curses.cbreak()
 
-        if use_colour:
+        if use_colour or (curses_palette is not None):
             curses.start_color()  # Only needed if not B/W
             curses.use_default_colors()
-            curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
-            curses_cols = [
-                curses.COLOR_GREEN, curses.COLOR_RED, curses.COLOR_WHITE, curses.COLOR_BLUE, curses.COLOR_CYAN,
-                curses.COLOR_MAGENTA, curses.COLOR_YELLOW
-            ]
 
-            for curses_col_num, curses_col in enumerate(curses_cols):
+            # Define first colour with inverted background, ensuring that if any text is displayed, it won't be obscured
+            curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
+
+            # Define remaining 15 colours
+            for curses_col_num, curses_col in enumerate([
+                curses.COLOR_RED, curses.COLOR_GREEN, curses.COLOR_YELLOW, curses.COLOR_BLUE, curses.COLOR_MAGENTA,
+                curses.COLOR_CYAN, curses.COLOR_WHITE
+            ]):
                 curses.init_pair(curses_col_num + 2, curses.COLOR_BLACK, curses_col)
+
+            # Set up default mapping.  We'll be looking up list entries via index, so we don't need to use a dictionary.
+            self.palette_index = [1, 3, 2, 8, 5, 7, 6, 4] * 2
+
+            # Override some (or all) of the colours with a user-defined palette, if necessary
+            if curses_palette is not None:
+                if len(curses_palette) > 0xF:
+                    raise RendererError("Too many palette colours defined.")
+
+                for curses_colour_num, curses_colour in enumerate(curses_palette):
+                    try:
+                        curses_colour_int = int(curses_colour, 8)
+                    except ValueError:
+                        raise RendererError("Invalid palette colour defined.") from None
+
+                    self.palette_index[curses_colour_num] = curses_colour_int + 1
 
         super().__init__(scale, use_colour)
 
@@ -74,16 +93,16 @@ class Renderer(RendererBase):
         # bottom-right pixel.
         self.pad = curses.newpad(height + 1, adjusted_width)
 
-        if self.use_colour:
+        if self.palette_index:
             # Sometimes the background is not erased correctly if using colours rather than inverted pixels.  This
             # ensures the erase happens properly.
-            self.pad.bkgd(" ", curses.color_pair(1))
+            self.pad.bkgd(" ", curses.color_pair(self.palette_index[0]))
 
         super().set_resolution(width, height)
 
     def set_pixel(self, x, y, colour):
-        if self.use_colour:
-            curses_colour = curses.color_pair((colour % 8) + 1)
+        if self.palette_index:
+            curses_colour = curses.color_pair(self.palette_index[colour])
         else:
             curses_colour = curses.A_REVERSE if colour else curses.A_NORMAL
 

@@ -71,7 +71,12 @@ def main(args):
     ram.write_block(0x200, loader.load_binary(args["filename"]))
 
     # Set up a new rendering system based on the selected guest
-    renderer = Renderer(scale=args["scale"], use_colour=(arch >= ARCH_XO_CHIP), pygame_palette=args["pygame_palette"])
+    renderer = Renderer(
+        scale=args["scale"],
+        use_colour=(arch >= ARCH_XO_CHIP),
+        pygame_palette=args["pygame_palette"],
+        curses_palette=args["curses_palette"]
+    )
 
     # If the user is interested in seeing the cursor in Curses mode, show it
     if opt_renderer == "curses":

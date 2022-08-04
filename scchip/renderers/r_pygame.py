@@ -23,7 +23,7 @@ from .r_null import RendererError, Renderer as RendererBase
 
 
 class Renderer(RendererBase):
-    def __init__(self, scale=None, use_colour=True, pygame_palette=None):
+    def __init__(self, scale=None, use_colour=True, pygame_palette=None, **kwargs):
         if scale is None:
             scale = 512  # Default window width if not supplied, or set to default
 

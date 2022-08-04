@@ -3,7 +3,7 @@
 __author__ = "Gregory Maynard-Hoare"
 __copyright__ = "Copyright (C) 2022 Gregory Maynard-Hoare"
 __license__ = "GNU Affero General Public License v3.0"
-__version__ = "1.1.3"
+__version__ = "1.1.4"
 
 from argparse import ArgumentParser
 from scchip import main
@@ -28,7 +28,7 @@ def parse_args():
     )
     parser.add_argument(
         "-s", "--scale", type=int,
-        help=("set the window width in PyGame mode (default 512), and scale in Curses mode (default 2)")
+        help="set the window width in PyGame mode (default 512), and scale in Curses mode (default 2)"
     )
     parser.add_argument(
         "-m", "--curses_cursor_mode", type=int, choices=[0, 1, 2], default=0,
@@ -42,20 +42,24 @@ def parse_args():
         "--pygame_palette",
         help="redefine up to 16 colours for the PyGame renderer in comma-separated hex, e.g. 1234ABCD,F987654E,.. etc."
     )
+    parser.add_argument(
+        "--curses_palette",
+        help="redefine up to 16 colours for the Curses renderer using an octal sequence, e.g. 1234567013572460"
+    )
 
     for cpu_quirk in CPU_QUIRKS:
         parser.add_argument(
             "--{}_quirks".format(cpu_quirk), type=int, choices=[0, 1],
-            help="Manually disable or enable CPU {} quirks.".format(cpu_quirk.replace("_", " "))
+            help="manually disable or enable CPU {} quirks.".format(cpu_quirk.replace("_", " "))
         )
 
     parser.add_argument(
         "--screen_wrap_quirks", type=int, choices=[0, 1],
-        help="Manually disable or enable screen wrap quirks."
+        help="manually disable or enable screen wrap quirks."
     )
     parser.add_argument(
         "-d", "--debug", action="store_true", default=False,
-        help="Enables live debug output.  Only visible in PyGame renderer during play.  Slows CPU execution"
+        help="enable live debug output.  Only visible in PyGame renderer during play.  Slows CPU execution"
     )
     return parser.parse_args()  # Can call sys.exit(2) if args are incorrect
 
