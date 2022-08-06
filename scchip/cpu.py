@@ -14,7 +14,7 @@ benchmark, to ensure any changes are an improvement.
 __copyright__ = "Copyright (C) 2022 Gregory Maynard-Hoare"
 __license__ = "GNU Affero General Public License v3.0"
 
-from time import time
+from time import perf_counter
 from random import randint
 from math import ceil
 from .constants import APP_INTRO, ARCH_CHIP8, ARCH_SUPERCHIP_1_0, ARCH_CHIP48, ARCH_SUPERCHIP_1_1, ARCH_XO_CHIP
@@ -210,7 +210,7 @@ class CPU:
         self.pc = start_location
 
         while True:
-            this_time = time()  # Do this first for maximum precision
+            this_time = perf_counter()  # Do this first for maximum precision
             self.this_time = this_time
 
             # Performance counters
@@ -252,7 +252,7 @@ class CPU:
                 next_time = this_time + self.core_interval
 
                 while this_time < next_time:  # Unfortunately we have to do this to get the timing right
-                    this_time = time()
+                    this_time = perf_counter()
 
             self.perf_counter_ops += 1
 
