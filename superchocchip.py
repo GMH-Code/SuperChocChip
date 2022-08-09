@@ -15,8 +15,10 @@ def parse_args():
     parser.add_argument("filename", help="ROM to execute (normally ending in .ch8 or .c8)")
     parser.add_argument(
         "-a", "--arch", choices=list(SUPPORTED_CPUS.keys()), default="xochip16",
-        help="set CPU instructions, speed, and quirks automatically for CHIP-8, CHIP-48, Super-CHIP 1.0/1.1,"
-        + " XO-CHIP, or XO-CHIP 16-colour mode"
+        help=" ".join((
+            "set CPU instructions, speed, and quirks automatically for CHIP-8, CHIP-48, Super-CHIP 1.0/1.1,",
+            "XO-CHIP, or XO-CHIP 16-colour mode"
+        ))
     )
     parser.add_argument(
         "-c", "--clock_speed", type=int,

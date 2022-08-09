@@ -135,7 +135,7 @@ class Renderer(RendererBase):
             title_len = len(title)
 
             if self.width > title_len:
-                self.pad.addstr(0, 0, title + " " * (self.width * self.scale - title_len), curses.A_REVERSE)
+                self.pad.addstr(0, 0, "".join((title, " " * (self.width * self.scale - title_len))), curses.A_REVERSE)
                 self.refresh_needed = True
 
         super().set_title(title)

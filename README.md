@@ -88,9 +88,9 @@ The CPU includes variants of:
 - CHIP-8, CHIP-48, Super-CHIP 1.0, Super-CHIP 1.1 and XO-CHIP instruction sets
 
 Depending on the hardware/modes chosen in the emulator, included is:
-- 4K / 64K system RAM with byte/block access and fast moves
+- 4KB / 64KB system RAM with byte/block access and fast moves
 - 64x32 / 128x64 monochromatic, 4-colour / 16-colour displays
-- 256-byte / 1K video RAM
+- 4KB video RAM with legacy modes (1KB, 256-byte etc.)
 - 12-level / 16-level 12-bit CPU call stacks
 - 16x 8-bit aligned system registers
 - 16x user flag registers
@@ -99,23 +99,22 @@ Depending on the hardware/modes chosen in the emulator, included is:
 - 1x main system clock
 - 2x independent delay/sound hardware timers
 - 1x video timer
-- 1x / 3x video framebuffers
+- 1x video framebuffer, supporting multiple planes / VRAM banks
 - 2x video blitters, supported via plugin
 - 2x input devices, supported via plugin
-- Two custom-built high and low-res bitmap character sets
+- Two custom-built high and low-res bitmap character sets, loaded from ROM on boot
 
 Supported Features
 ------------------
 
-- Large, small, and colour sprites.  4-plane (16-colour) sprites are supported, even though the specification on this is unofficial.  These currently use shades of the other colours in the PyGame renderer.  In the Curses renderer, 8 colours are defined, and some are reused.
+- Large, small, and colour sprites.  ROMs which make use of 4 planes (16-colours) are also supported, even though the specification on this is still unofficial.
 - Fast 4-way scrolling.
-- An extra video timer, which ensures unnecessary rendering and flickering doesn't occur.  Modern games which use the delay timer to provide VSync emulation are supported.
+- The extra video timer is set to 60Hz, which ensures unnecessary rendering and flickering doesn't occur.  Modern games which use the delay timer to provide VSync emulation are supported.
 - Performance monitoring output (frames drawn and instructions executed per second).
 - Live visual disassembly of OpCodes/instructions about to be run (disabled by default, unless a CPU exception occurs).
-- Rendering deltas are done efficiently and limited to 60Hz.
 - The input and rendering modules can be swapped for your own creations.  In theory, you can make a game run on almost any custom display and keypad.
 - Custom-built CHIP-8 and Super-CHIP system fonts, with all characters drawable.
-- Redefinable palettes, in both PyGame and Curses renderers.
+- Redefinable palettes, in both PyGame and Curses renderers.  In the Curses renderer, you can choose which of the 8 colours are allocated to each of the 16 colours in the emulator.
 - Scale2x (high quality) smoothing in the PyGame renderer, off by default.
 
 Notes

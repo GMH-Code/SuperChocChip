@@ -34,17 +34,17 @@ class Renderer(RendererBase):
         self.display_surface = pygame.display.set_mode(self.scaled_size, 0, 8)
         self.smoothing = smoothing
 
-        if use_colour:
-            self.colour_map = {
-                0x1: 0x00E080, 0x2: 0xE05050, 0x3: 0xE0E0E0, 0x4: 0x303030,
-                0x5: 0x00D070, 0x6: 0xD04040, 0x7: 0xD0D0D0, 0x8: 0x404040,
-                0x9: 0x00C060, 0xA: 0xC03030, 0xB: 0xC0C0C0, 0xC: 0x505050,
-                0xD: 0x00B050, 0xE: 0xB02020, 0xF: 0xB0B0B0
-            }
-        else:
-            self.colour_map = {1: 0xE0E0E0}
+        # These are looked up instantly by index, so no need for a dictionary on this occasion
+        self.colour_map = [
+            0x222222, 0x00DD88, 0xDD5555, 0xDDDDDD,
+            0x333333, 0x00CC77, 0xCC4444, 0xCCCCCC,
+            0x444444, 0x00BB66, 0xBB3333, 0xBBBBBB,
+            0x555555, 0x00AA55, 0xAA2222, 0xAAAAAA
+        ]
 
-        self.colour_map[0] = 0x202020
+        if not use_colour:
+            # Swap green for white on monochromatic displays
+            self.colour_map[1] = self.colour_map[3]
 
         # Override some (or all) of the colours with a user-defined palette, if necessary
         if pygame_palette is not None:

@@ -3,25 +3,25 @@
 """
 Framebuffer Emulator
 
-Pixels are written here and are usually only drawn to the actual display (the
+Pixels are written here, and are usually only drawn to the actual display (the
 host rendering system) at 60Hz.  We probably could get away with not having a
-Framebuffer, but then we'd rely on rendering frameworks to support specific
-drawing and scrolling methods. There would also be no guarantee of rendering
-speed when calling external libraries that often.  PyGame/Curses can lower
-speed substantially when calling some methods tens/hundreds of thousands of
-times a second.
+Framebuffer, but then we'd rely on rendering frameworks supporting specific
+drawing and scrolling methods, and there would also be no guarantee of
+rendering speed when calling external libraries that often.  PyGame/Curses can
+lower speed substantially when calling some methods tens/hundreds of thousands
+of times a second.
 
 Unlike other computers, programs for this system cannot write directly into
-video RAM.  Instead sprites are drawn to the screen using an XOR method against
-one or more planes.
+video RAM.  Instead, sprites are drawn to the screen using an XOR method
+against one or more planes.
 
-Collisions (where a pixel was set, but is unset by an XOR), are reported).  If
-using Super-CHIP variants, the number of rows are reported, too.
+Multiple planes are supported, such as 4 planes for 16 colours.  Before
+rendering, these planes are merged and form a specific colour depending on
+which pixel combinations are set.
 
-This can easily be extended to 4 planes (for 16 colours).  This has been
-trialed, and works, but it is not included because no official specification
-(such as a proper palette) has been released for it yet, and I only know of one
-game which uses it.
+Collisions (where any pixel was set, but was unset by an XOR), are reported.
+If using Super-CHIP (or higher) variants, the number of collided rows are
+reported, rather than just a flag being set.
 """
 
 __copyright__ = "Copyright (C) 2022 Gregory Maynard-Hoare"
@@ -93,7 +93,6 @@ class Framebuffer():
         if self.allow_wrapping:
             x %= self.vid_width
             y %= self.vid_height
-
         elif x >= self.vid_width or y >= self.vid_height:
             return None
 

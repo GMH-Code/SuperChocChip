@@ -23,26 +23,29 @@ __license__ = "GNU Affero General Public License v3.0"
 
 from .constants import ARCH_SUPERCHIP_1_0
 
+DEBUG = "".join(("V: 0x", "{:02x}" * 16, " I: 0x{:04x} DT: 0x{:02x} DS: 0x{:02x} PC: 0x{:03x} OP: 0x{:04x} IN: {}"))
+DEBUG_RPL = "".join(("\nRPL: 0x", "{:02x}" * 16))
+
 
 class Debugger:
     def __init__(self):
         self.live = False
 
     def debug(self, cpu, instruction, verbose=False):
-        debug_str = (
-            "V: 0x" + ("{:02x}" * 16) + " I: 0x{:04x} DT: 0x{:02x} DS: 0x{:02x} PC: 0x{:03x} OP: 0x{:04x} IN: {}"
-        ).format(
+        debug_str = DEBUG.format(
             *[cpu.v[reg_num] for reg_num in range(15, -1, -1)] +
             [cpu.i, cpu.dt, cpu.ds, cpu.debug_pc, cpu.opcode, instruction]
         )
 
         if verbose:
             if cpu.arch >= ARCH_SUPERCHIP_1_0:
-                debug_str += ("\nRPL: 0x" + "{:02x}" * 16).format(*[cpu.rpl[reg_num] for reg_num in range(15, -1, -1)])
+                debug_str = "".join((
+                    debug_str, DEBUG_RPL.format(*[cpu.rpl[reg_num] for reg_num in range(15, -1, -1)])
+                ))
 
             stack_items = cpu.stack.get_items()
             stack_str = (" 0x{:03x}" * len(stack_items)).format(*stack_items)
-            debug_str += ("\nStack:{}").format(stack_str or " (Empty)")
+            debug_str = "".join((debug_str, ("\nStack:{}").format(stack_str or " (Empty)")))
 
         return debug_str
 
