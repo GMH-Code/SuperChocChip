@@ -9,7 +9,20 @@ This emulator can run ROMs (machine code binaries, usually games) for all the fo
 - XO-CHIP
 - XO-CHIP -- Extended colours
 
-It is written from the ground up in Pure Python, runs on Linux (out of the box), or on Windows, and emulates a proper computer with CPU, keypad, display, etc., and can run, and play, native ROMs freely available on the Internet at 100% speed, even on older hosts.
+It is written from the ground up in Pure Python, and runs on Linux (normally out of the box), Windows, Mac OS X, and more.
+
+A computer is emulated with CPU, keypad, display, etc.  It can run, and play, native ROMs freely available on the Internet at 100% speed, even on older hosts.
+
+Screenshots
+-----------
+
+Here are some screenshots of various freely available games running in the emulator:
+
+![Kesha Was Ninja](./screenshots/keshawasninja.jpg) ![Chicken Scratch](./screenshots/chickenscratch.jpg) ![DVN8](./screenshots/dvn8.jpg) ![Into the GarlicScape](./screenshots/garlicscape.jpg) ![Super Neatboy](./screenshots/superneatboy.jpg) ![Octoma](./screenshots/octoma.jpg) ![Octopeg](./screenshots/octopeg.jpg) ![Rockto](./screenshots/rockto.jpg) ![Piper](./screenshots/piper.jpg) ![Civiliz8n](./screenshots/civiliz8n.jpg)
+
+It is also possible, in a somewhat limited extent, to use the Windows Command Prompt, Powershell, or the Terminal on Linux, as shown below.  You can also play multicolour games over an SSH connection:
+
+![Inv8sion](./screenshots/inv8sioncmd.jpg) ![Blinky](./screenshots/blinkycmd.jpg)
 
 Running a ROM
 -------------
@@ -18,14 +31,20 @@ One command will start the emulator with the default (and most compatible) setti
 
     python3 superchocchip.py <filename>
 
-Replace 'python3' with 'python' or 'py' if that does not work.
+Replace `python3` with `python` or `py` if that does not work.  You can also use PyPy (a Just-In-Time compiler), for a huge speed boost.
 
-You can play games in either PyGame (a fast SDL Desktop Window) or Curses (the Terminal).
-
-PyGame will be used to draw graphics and take inputs, if it is available.  This is highly recommended as it is far more responsive for keypresses, draws faster, and looks better.  The Terminal has to use up a lot of space to draw graphics, and key presses / releases are simulated from character inputs.  This does, however, mean you can play emulated games over SSH.
+You can play games in either PyGame (a fast SDL Desktop Window) or Curses (the Terminal).  PyGame will be used to draw graphics and take inputs, if it is available.  This is highly recommended, as it is far more responsive for keypresses, draws faster, and looks better.  The Terminal has to use up a lot of space to draw graphics, and key presses / releases are simulated from character inputs.  This does, however, mean you can play emulated games over SSH.
 
 For some older games, you might find you need to play with the command line settings, especially the quirks, to find out what works.  Many games have been written over the years for various emulators with different behaviours, some which did not follow original specifications quite correctly.  I've tried to cover as many of these quirks as possible.
 
+Note that if you're running the emulator on Windows, you will need to either run commands such as `pip install pygame` or `pip install windows-curses`, before the emulator will be able to draw anything on-screen.  If you install both of these packages, you can then choose which one you want to use.
+
+Using the Optional PyPy JIT Compiler
+------------------------------------
+
+The PyPy Just-In-Time compiler is supported for a huge (almost 10x average) speed increase, and it works really well with this emulator's code style.  Note that not all versions of PyPy have PyGame and Curses available.  You can look [here](https://pypi.org/project/pygame/#files) (no need to download anything) to find out in advance which version of PyPy you'll need to get to have PyGame support, if you'd like to try a high-performance mode.
+
+If you'd like to use Curses on Linux or Mac OS X, the latest 64-bit or 32-bit versions of PyPy should work.  PyPy doesn't yet have a version of Windows-Curses.
 
 Keypad
 ------
