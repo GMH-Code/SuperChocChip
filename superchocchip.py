@@ -3,7 +3,7 @@
 __author__ = "Gregory Maynard-Hoare"
 __copyright__ = "Copyright (C) 2022 Gregory Maynard-Hoare"
 __license__ = "GNU Affero General Public License v3.0"
-__version__ = "1.1.5"
+__version__ = "1.1.6"
 
 from argparse import ArgumentParser
 from scchip import main

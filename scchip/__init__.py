@@ -23,6 +23,10 @@ from .ram import RAM
 from .stack import Stack
 
 
+class StartupError(Exception):
+    pass
+
+
 def main(args):
     print("".join((APP_INTRO, APP_COPYRIGHT)))
     quirk_settings = {}
@@ -33,24 +37,43 @@ def main(args):
         quirk_settings[quirk_label] = None if quirk_setting is None else bool(quirk_setting)
 
     opt_renderer = args["renderer"]
-    if opt_renderer is None:
-        # No renderer selected.  Try PyGame first, and if that doesn't work, fall back to Curses.
-        try:
-            # pylint: disable=unused-import,import-outside-toplevel
-            # flake8: noqa: F401
-            import pygame
-        except ImportError:  # Also catches ModuleNotFoundError
-            opt_renderer = "curses"
-        else:
-            opt_renderer = "pygame"
+    auto_select_renderer = opt_renderer is None  # If necessary, try PyGame first, then Curses.
 
-    if opt_renderer == "pygame":
-        from .inputs.i_pygame import Inputs
-        from .renderers.r_pygame import Renderer
-    elif opt_renderer == "curses":
-        from .inputs.i_curses import Inputs
-        from .renderers.r_curses import Renderer
-    else:
+    # flake8: noqa: F401
+    if auto_select_renderer or opt_renderer == "pygame":
+        # pylint: disable=unused-import, import-outside-toplevel, raise-missing-from
+        try:
+            import pygame
+        except ImportError:
+            if auto_select_renderer:
+                opt_renderer = "curses"
+            else:
+                raise StartupError(
+                    "PyGame does not appear to be installed."
+                )
+        else:
+            from .inputs.i_pygame import Inputs
+            from .renderers.r_pygame import Renderer
+
+    if opt_renderer == "curses":
+        # pylint: disable=unused-import, import-outside-toplevel, raise-missing-from
+        try:
+            import curses
+        except ImportError:
+            if auto_select_renderer:
+                raise StartupError(
+                    "Neither PyGame nor Curses (or Windows-Curses) appear to be installed."
+                )
+
+            raise StartupError(
+                "Curses (or Windows-Curses) does not appear to be installed."
+            )
+        else:
+            from .inputs.i_curses import Inputs
+            from .renderers.r_curses import Renderer
+
+    if opt_renderer == "null":
+        # pylint: disable=import-outside-toplevel
         from .inputs.i_null import Inputs
         from .renderers.r_null import Renderer
 

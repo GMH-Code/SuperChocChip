@@ -18,7 +18,7 @@ class RendererError(Exception):
 
 
 class Renderer:
-    def __init__(self, scale=None, use_colour=True, **kwargs):
+    def __init__(self, scale=None, use_colour=True, **kwargs):  # pylint: disable=unused-argument
         self.scale = 1 if scale is None else scale
         self.use_colour = use_colour
         self.set_resolution(0, 0)
