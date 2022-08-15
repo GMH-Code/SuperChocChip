@@ -49,15 +49,18 @@ class Framebuffer():
         for _ in range(num_planes):
             self.ram_banks.append(RAM())
 
-        # Map all the masks into matching planes for fast lookup
-        self.mask_to_planes = {}
+        # Map all the masks into matching planes for fast lookup.  We are looking up by index number, so this will
+        # retain O(1) complexity, but should be slightly faster than a dict on access.
+        self.mask_to_planes = []
 
         for mask in range(2 ** num_planes):
-            self.mask_to_planes[mask] = []
+            mask_planes = []
 
             for plane_num in range(num_planes):
                 if mask & 2 ** plane_num:
-                    self.mask_to_planes[mask].append(self.ram_banks[plane_num])
+                    mask_planes.append(self.ram_banks[plane_num])
+
+            self.mask_to_planes.append(mask_planes)
 
         self.affect_planes = self.mask_to_planes[1]
 
@@ -186,10 +189,10 @@ class Framebuffer():
         self.renderer.refresh_display()
 
     def switch_planes(self, mask):
-        self.affect_planes = self.mask_to_planes.get(mask)
-
-        if self.affect_planes is None:
-            raise FramebufferError("Selected display plane is out of range for this architecture")
+        try:
+            self.affect_planes = self.mask_to_planes[mask]
+        except IndexError:
+            raise FramebufferError("Selected display plane is out of range for this architecture") from None
 
     def get_vid_size(self):
         return self.vid_width, self.vid_height
