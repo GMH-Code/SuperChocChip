@@ -23,7 +23,7 @@ class RAM:
         self.resize(0)
 
     def resize(self, mem_size):
-        self.mem = memoryview(bytearray(b"\x00" * mem_size))
+        self.mem = memoryview(bytearray(mem_size))
         self.mem_top = mem_size - 1
         self.mem_size = mem_size
 
