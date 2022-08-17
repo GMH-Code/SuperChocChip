@@ -11,7 +11,7 @@ This emulator can run ROMs (machine code binaries, usually games) for all the fo
 
 It is written from the ground up in Pure Python, and runs on Linux (normally out of the box), Windows, Mac OS X, and more.
 
-A computer is emulated with CPU, keypad, display, etc.  It can run, and play, native ROMs freely available on the Internet at 100% speed, even on older hosts.
+A computer is emulated with CPU, keypad, display, sound, etc.  It can run, and play, native ROMs freely available on the Internet at 100% speed, even on older hosts.
 
 Screenshots
 -----------
@@ -33,7 +33,7 @@ One command will start the emulator with the default (and most compatible) setti
 
 Replace `python3` with `python` or `py` if that does not work.  You can also use PyPy (a Just-In-Time compiler), for a huge speed boost.
 
-You can play games in either PyGame (a fast SDL Desktop Window) or Curses (the Terminal).  PyGame will be used to draw graphics and take inputs, if it is available.  This is highly recommended, as it is far more responsive for keypresses, draws faster, and looks better.  The Terminal has to use up a lot of space to draw graphics, and key presses / releases are simulated from character inputs.  This does, however, mean you can play emulated games over SSH.
+You can play games in either PyGame (a fast SDL Desktop Window) or Curses (the Terminal).  PyGame will be used for graphics, inputs, and sound, if it is available.  This is highly recommended, as it is far more responsive for keypresses, draws faster, and looks better.  The Terminal has to use up a lot of space to draw graphics, key presses/releases are simulated from character inputs, and it can also only produce basic beeps, whereas PyGame can output sampled sound.  Using the Terminal does, however, mean you can play emulated games over SSH.
 
 For some older games, you might find you need to play with the command line settings, especially the quirks, to find out what works.  Many games have been written over the years for various emulators with different behaviours, some which did not follow original specifications quite correctly.  I've tried to cover as many of these quirks as possible.
 
@@ -62,7 +62,7 @@ Command-line Parameters
 -----------------------
 
     Usage:
-        superchocchip.py [-h] [-a {chip8,schip1.0,chip48,schip1.1,xochip,xochip16}] [-c CLOCK_SPEED] [-r {pygame,curses,null}] [-s SCALE] [-f SMOOTHING] [-m {0,1,2}] [-k KEYMAP] [--pygame_palette PYGAME_PALETTE] [--curses_palette CURSES_PALETTE] [--load_quirks {0,1}] [--shift_quirks {0,1}] [--logic_quirks {0,1}] [--index_overflow_quirks {0,1}] [--index_increment_quirks {0,1}] [--jump_quirks {0,1}] [--screen_wrap_quirks {0,1}] [-d]
+        superchocchip.py [-h] [-a {chip8,schip1.0,chip48,schip1.1,xochip,xochip16}] [-c CLOCK_SPEED] [-r {pygame,curses,null}] [-s SCALE] [-f SMOOTHING] [-m MUTE] [-k KEYMAP] [--curses_cursor_mode {0,1,2}] [--pygame_palette PYGAME_PALETTE] [--curses_palette CURSES_PALETTE] [--load_quirks {0,1}] [--shift_quirks {0,1}] [--logic_quirks {0,1}] [--index_overflow_quirks {0,1}] [--index_increment_quirks {0,1}] [--jump_quirks {0,1}] [--screen_wrap_quirks {0,1}] [-d]
         filename
 
     Positional arguments:
@@ -75,15 +75,16 @@ Command-line Parameters
         -c CLOCK_SPEED, --clock_speed CLOCK_SPEED
                               override the CPU speed in operations/second, regardless of architecture (0=force uncapped)
         -r {pygame,curses,null}, --renderer {pygame,curses,null}
-                              set the rendering and input systems (pygame by default if available, otherwise curses)
+                              set the rendering, input, and audio systems (pygame by default if available, otherwise curses)
         -s SCALE, --scale SCALE
                               set the window width in PyGame mode (default 512), and scale in Curses mode (default 2)
         -f SMOOTHING, --smoothing SMOOTHING
                               define the number of smoothing filter passes for higher quality rendering (default 0)
-        -m {0,1,2}, --curses_cursor_mode {0,1,2}
-                              control cursor visibility in the Curses renderer
+        -m MUTE, --mute MUTE  mute the emulated audio. 0 = unmuted (default for PyGame), 1 = muted (default for Curses)
         -k KEYMAP, --keymap KEYMAP
                               redefine the 16 keyscan codes (PyGame) or character numbers (Curses). Separate each decimal with a comma
+        --curses_cursor_mode {0,1,2}
+                              control cursor visibility in the Curses renderer
         --pygame_palette PYGAME_PALETTE
                               redefine up to 16 colours for the PyGame renderer in comma-separated hex, e.g. 1234ABCD,F987654E,.. etc.
         --curses_palette CURSES_PALETTE
@@ -122,6 +123,7 @@ Depending on the hardware/modes chosen in the emulator, included is:
 - 2x video blitters, supported via plugin
 - 2x input devices, supported via plugin
 - Two custom-built high and low-res bitmap character sets, loaded from ROM on boot
+- System buzzer with adjustable frequency and programmable samples
 
 Supported Features
 ------------------
@@ -135,6 +137,7 @@ Supported Features
 - Custom-built CHIP-8 and Super-CHIP system fonts, with all characters drawable.
 - Redefinable palettes, in both PyGame and Curses renderers.  In the Curses renderer, you can choose which of the 8 colours are allocated to each of the 16 colours in the emulator.
 - Scale2x (high quality) smoothing in the PyGame renderer, off by default.
+- Realtime audio, capable of playing both basic beeps and XO-CHIP sound/music.
 
 Notes
 -----
@@ -172,7 +175,6 @@ Future Expansion
 - The test ROMs could be automatically validated as part of the tests, which would be nice.  This will require halting the CPU after a specified number of cycles and then verifying a SHA checksum of the Framebuffer VRAM banks against an expected value.
 - Snapshots (save states) and saving/restoring of RPL registers to/from disk.  I'm not so bothered about this at the moment, but some games, such as RPGs, are becoming longer to play, so saving your progress would be good to have.
 - Per-game saved configuration of palette(s) and quirks, at least.
-- Audio output, despite the fact I'll probably end up muting it anyway.
 
 Extending
 ---------

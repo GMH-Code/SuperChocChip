@@ -12,6 +12,7 @@ from scchip.stack import Stack
 from scchip.framebuffer import Framebuffer
 from scchip.renderers.r_null import Renderer
 from scchip.inputs.i_null import Inputs
+from scchip.audio.a_null import Audio
 
 # NOTE: Complete quirk behaviour tests on instructions
 
@@ -24,7 +25,8 @@ class TestCPU(unittest.TestCase):
         renderer = Renderer(use_colour=True)
         self.framebuffer = Framebuffer(renderer, num_planes=4)
         self.cpu = CPU(
-            ARCH_XO_CHIP_16, self.ram, self.stack, self.framebuffer, Inputs(DEFAULT_KEYMAP, renderer), Debugger()
+            ARCH_XO_CHIP_16, self.ram, self.stack, self.framebuffer, Inputs(DEFAULT_KEYMAP, renderer), Audio(),
+            Debugger()
         )
         self.cpu.pc = 0x200
 

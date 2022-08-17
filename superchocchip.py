@@ -3,7 +3,7 @@
 __author__ = "Gregory Maynard-Hoare"
 __copyright__ = "Copyright (C) 2022 Gregory Maynard-Hoare"
 __license__ = "GNU Affero General Public License v3.0"
-__version__ = "1.1.6"
+__version__ = "1.2.1"
 
 from argparse import ArgumentParser
 from scchip import main
@@ -26,7 +26,7 @@ def parse_args():
     )
     parser.add_argument(
         "-r", "--renderer", choices=["pygame", "curses", "null"],
-        help="set the rendering and input systems (pygame by default if available, otherwise curses)"
+        help="set the rendering, input, and audio systems (pygame by default if available, otherwise curses)"
     )
     parser.add_argument(
         "-s", "--scale", type=int,
@@ -37,12 +37,16 @@ def parse_args():
         help="define the number of smoothing filter passes for higher quality rendering (default 0)"
     )
     parser.add_argument(
-        "-m", "--curses_cursor_mode", type=int, choices=[0, 1, 2], default=0,
-        help="control cursor visibility in the Curses renderer"
+        "-m", "--mute", type=int,
+        help="mute the emulated audio.  0 = unmuted (default for PyGame), 1 = muted (default for Curses)"
     )
     parser.add_argument(
         "-k", "--keymap", default=DEFAULT_KEYMAP,
         help="redefine the 16 keyscan codes (PyGame) or character numbers (Curses).  Separate each decimal with a comma"
+    )
+    parser.add_argument(
+        "--curses_cursor_mode", type=int, choices=[0, 1, 2], default=0,
+        help="control cursor visibility in the Curses renderer"
     )
     parser.add_argument(
         "--pygame_palette",

@@ -38,6 +38,7 @@ def main(args):
 
     opt_renderer = args["renderer"]
     auto_select_renderer = opt_renderer is None  # If necessary, try PyGame first, then Curses.
+    mute_audio = args["mute"]
 
     # flake8: noqa: F401
     if auto_select_renderer or opt_renderer == "pygame":
@@ -54,6 +55,12 @@ def main(args):
         else:
             from .inputs.i_pygame import Inputs
             from .renderers.r_pygame import Renderer
+
+            # PyGame can handle proper waveforms
+            if mute_audio:
+                from .audio.a_null import Audio
+            else:
+                from .audio.a_pygame import Audio
 
     if opt_renderer == "curses":
         # pylint: disable=unused-import, import-outside-toplevel, raise-missing-from
@@ -72,10 +79,17 @@ def main(args):
             from .inputs.i_curses import Inputs
             from .renderers.r_curses import Renderer
 
+            # Terminals can handle fixed-length beeps, but not sampled sound
+            if mute_audio or mute_audio is None:
+                from .audio.a_null import Audio
+            else:
+                from .audio.a_curses import Audio
+
     if opt_renderer == "null":
         # pylint: disable=import-outside-toplevel
         from .inputs.i_null import Inputs
         from .renderers.r_null import Renderer
+        from .audio.a_null import Audio
 
     arch = SUPPORTED_CPUS[args["arch"]]
     loader = Loader()
@@ -126,6 +140,11 @@ def main(args):
     # Set up host inputs, and link to the chosen rendering module in case it provides inputs too
     inputs = Inputs(args["keymap"], renderer)
 
+    # Start up the audio system and set a default square beep waveform
+    audio = Audio()
+    audio.set_frequency(4000)
+    audio.set_buffer(memoryview(bytearray((b"\x00\xFF") * 8)))
+
     # Set up non-shared CPU stack in host memory -- 12 levels for CHIP-8 CPUs, 16 for Super-CHIP 1.0 and above
     stack = Stack(16 if arch >= ARCH_SUPERCHIP_1_0 else 12)
 
@@ -134,5 +153,5 @@ def main(args):
     debugger.set_live(args["debug"])
 
     # Create a new CPU, plug it into the rest of the system, and boot it up at the default address
-    cpu = CPU(arch, ram, stack, framebuffer, inputs, debugger, clock_speed=args["clock_speed"], **quirk_settings)
+    cpu = CPU(arch, ram, stack, framebuffer, inputs, audio, debugger, clock_speed=args["clock_speed"], **quirk_settings)
     cpu.run(0x200)

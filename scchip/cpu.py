@@ -30,7 +30,7 @@ class CPUError(Exception):
 
 
 class CPU:
-    def __init__(self, arch, ram, stack, framebuffer, inputs, debugger, clock_speed=None, load_quirks=None,
+    def __init__(self, arch, ram, stack, framebuffer, inputs, audio, debugger, clock_speed=None, load_quirks=None,
                  shift_quirks=None, logic_quirks=None, index_overflow_quirks=None, index_increment_quirks=None,
                  jump_quirks=None):
 
@@ -39,6 +39,7 @@ class CPU:
         self.stack = stack
         self.framebuffer = framebuffer
         self.inputs = inputs
+        self.audio = audio
         self.debugger = debugger
         self.live_debug = self.debugger.is_live()
         self.sysfont_sm_loc = 0x50
@@ -200,6 +201,9 @@ class CPU:
         # Input-related vars
         self.awaiting_keypress = False
 
+        # Audio-related vars
+        self.audio_null = self.audio.is_null()
+
         # Performance-related vars
         self.next_display_update_time = 0
         self.perf_counter_fps = 0
@@ -239,6 +243,10 @@ class CPU:
             if self.ds > 0:
                 ds_float = (self.ds_target - this_time) * TIMER_FREQ
                 self.ds = max(0, ceil(ds_float))
+
+                if self.ds <= 0:
+                    # Audio timer just reached zero.  Stop the audio.
+                    self.audio.enable_buzzer(False)
 
             # Keep track of the program counter before altering it in any way for debugging purposes
             self.debug_pc = self.pc  # Do this all the time in case there is a crash
@@ -633,6 +641,8 @@ class CPU:
             self.debug("LD ST, V{:01x}".format(self.vx))
 
         ds = self.v[self.vx]
+        # Allow the program to start the buzzer, or immediately stop it before the sound timer hits zero
+        self.audio.enable_buzzer(ds > 0)
         self.ds = ds
         self.ds_target = self.this_time + (ds / TIMER_FREQ)
 
@@ -842,8 +852,6 @@ class CPU:
         self.framebuffer.switch_planes(self.vx)
 
     def _Fx02(self):  # XSTA
-        # NOTE: Audio pattern buffer storage not implemented
-
         # Only 0xF002 is supported by the CPU, but since there is no 0xF102, 0xF202, .., 0xFF02, we can catch the
         # entirety of Fx02 with the same bitmask as other 0xFs, and then just check the second nibble (Vx) is 0
         if self.vx != 0:
@@ -852,8 +860,20 @@ class CPU:
         if self.live_debug:
             self.debug("XSTA")
 
-    def _Fx3A(self):  # XPR
-        # NOTE: Pitch register assignment not implemented
+        if self.audio_null:
+            # Return without doing anything if we don't have a proper audio driver
+            return
 
+        buffer = self.ram.read_block(self.i, 16)
+        self.audio.set_buffer(buffer)
+
+    def _Fx3A(self):  # XPR
         if self.live_debug:
             self.debug("XPR V{:01x}".format(self.vx))
+
+        if self.audio_null:
+            # Return without doing anything if we don't have a proper audio driver
+            return
+
+        # This is the standard XO-CHIP translation formula to convert the Vx register to playback frequency in Hz
+        self.audio.set_frequency(4000 * (2 ** ((self.v[self.vx] - 64) / 48.0)))
