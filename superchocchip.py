@@ -22,7 +22,7 @@ def parse_args():
     )
     parser.add_argument(
         "-c", "--clock_speed", type=int,
-        help="override the CPU speed in operations/second, regardless of architecture (0=force uncapped)"
+        help="override the CPU speed in operations/second, regardless of architecture (0 = force uncapped)"
     )
     parser.add_argument(
         "-r", "--renderer", choices=["pygame", "curses", "null"],
@@ -37,7 +37,7 @@ def parse_args():
         help="define the number of smoothing filter passes for higher quality rendering (default 0)"
     )
     parser.add_argument(
-        "-m", "--mute", type=int,
+        "-m", "--mute", type=int, choices=[0, 1],
         help="mute the emulated audio.  0 = unmuted (default for PyGame), 1 = muted (default for Curses)"
     )
     parser.add_argument(
@@ -60,12 +60,12 @@ def parse_args():
     for cpu_quirk in CPU_QUIRKS:
         parser.add_argument(
             "--{}_quirks".format(cpu_quirk), type=int, choices=[0, 1],
-            help="manually disable or enable CPU {} quirks.".format(cpu_quirk.replace("_", " "))
+            help="manually disable or enable CPU {} quirks".format(cpu_quirk.replace("_", " "))
         )
 
     parser.add_argument(
         "--screen_wrap_quirks", type=int, choices=[0, 1],
-        help="manually disable or enable screen wrap quirks."
+        help="manually disable or enable screen wrap quirks"
     )
     parser.add_argument(
         "-d", "--debug", action="store_true", default=False,

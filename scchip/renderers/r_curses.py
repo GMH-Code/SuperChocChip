@@ -24,7 +24,7 @@ from .r_null import RendererError, Renderer as RendererBase
 
 
 class Renderer(RendererBase):
-    def __init__(self, scale=None, use_colour=True, curses_palette=None, **kwargs):
+    def __init__(self, scale=None, use_colour=True, curses_palette=None, curses_cursor_mode=0, **kwargs):
         if scale is None:
             scale = 2  # Default horizontal stretch if not supplied, or set to default
 
@@ -32,12 +32,16 @@ class Renderer(RendererBase):
         self.pad = None
         self.last_screen_height = -1
         self.last_screen_width = -1
-        self.cursor_mode = 0
         self.palette_index = None
         self.screen = curses.initscr()
-        curses.curs_set(self.cursor_mode)
+        curses.savetty()
         curses.noecho()
         curses.cbreak()
+
+        try:
+            curses.curs_set(curses_cursor_mode)
+        except _curses.error:
+            pass
 
         if use_colour or (curses_palette is not None):
             curses.start_color()  # Only needed if not B/W
@@ -75,15 +79,7 @@ class Renderer(RendererBase):
         if self.pad:
             del self.pad
 
-        curses.nocbreak()
-        curses.echo()
-
-        if self.cursor_mode != 1:
-            try:
-                curses.curs_set(1)
-            except _curses.error:
-                pass
-
+        curses.resetty()
         curses.endwin()
 
     def set_resolution(self, width, height):
@@ -141,9 +137,6 @@ class Renderer(RendererBase):
         super().set_title(title)
 
     # No Superclass for these Curses-specific methods
-
-    def set_curses_cursor(self, mode):
-        self.cursor_mode = mode
 
     def get_curses_screen(self):
         return self.screen

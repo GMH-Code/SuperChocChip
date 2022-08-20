@@ -36,9 +36,6 @@ class Inputs(InputsBase):
 
         super().__init__(keymap, renderer)
 
-    def __del__(self):
-        pygame.quit()
-
     def process_messages(self):
         # Call PyGame method based on fast dictionary lookup of event
         quit_program = False

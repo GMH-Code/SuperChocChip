@@ -113,12 +113,9 @@ def main(args):
         use_colour=(arch >= ARCH_XO_CHIP),
         pygame_palette=args["pygame_palette"],
         curses_palette=args["curses_palette"],
+        curses_cursor_mode=args["curses_cursor_mode"],
         smoothing=args["smoothing"]
     )
-
-    # If the user is interested in seeing the cursor in Curses mode, show it
-    if opt_renderer == "curses":
-        renderer.set_curses_cursor(args["curses_cursor_mode"])
 
     # Initialise framebuffer and attach to rendering system
     screen_wrap_quirks = args["screen_wrap_quirks"]

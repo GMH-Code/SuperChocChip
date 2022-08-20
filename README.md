@@ -62,7 +62,7 @@ Command-line Parameters
 -----------------------
 
     Usage:
-        superchocchip.py [-h] [-a {chip8,schip1.0,chip48,schip1.1,xochip,xochip16}] [-c CLOCK_SPEED] [-r {pygame,curses,null}] [-s SCALE] [-f SMOOTHING] [-m MUTE] [-k KEYMAP] [--curses_cursor_mode {0,1,2}] [--pygame_palette PYGAME_PALETTE] [--curses_palette CURSES_PALETTE] [--load_quirks {0,1}] [--shift_quirks {0,1}] [--logic_quirks {0,1}] [--index_overflow_quirks {0,1}] [--index_increment_quirks {0,1}] [--jump_quirks {0,1}] [--screen_wrap_quirks {0,1}] [-d]
+        superchocchip.py [-h] [-a {chip8,schip1.0,chip48,schip1.1,xochip,xochip16}] [-c CLOCK_SPEED] [-r {pygame,curses,null}] [-s SCALE] [-f SMOOTHING] [-m {0,1}] [-k KEYMAP] [--curses_cursor_mode {0,1,2}] [--pygame_palette PYGAME_PALETTE] [--curses_palette CURSES_PALETTE] [--load_quirks {0,1}] [--shift_quirks {0,1}] [--logic_quirks {0,1}] [--index_overflow_quirks {0,1}] [--index_increment_quirks {0,1}] [--jump_quirks {0,1}] [--screen_wrap_quirks {0,1}] [-d]
         filename
 
     Positional arguments:
@@ -73,14 +73,15 @@ Command-line Parameters
         -a {chip8,schip1.0,chip48,schip1.1,xochip,xochip16}, --arch {chip8,schip1.0,chip48,schip1.1,xochip,xochip16}
                               set CPU instructions, speed, and quirks automatically for CHIP-8, CHIP-48, Super-CHIP 1.0/1.1, XO-CHIP, or XO-CHIP 16-colour mode
         -c CLOCK_SPEED, --clock_speed CLOCK_SPEED
-                              override the CPU speed in operations/second, regardless of architecture (0=force uncapped)
+                              override the CPU speed in operations/second, regardless of architecture (0 = force uncapped)
         -r {pygame,curses,null}, --renderer {pygame,curses,null}
                               set the rendering, input, and audio systems (pygame by default if available, otherwise curses)
         -s SCALE, --scale SCALE
                               set the window width in PyGame mode (default 512), and scale in Curses mode (default 2)
         -f SMOOTHING, --smoothing SMOOTHING
                               define the number of smoothing filter passes for higher quality rendering (default 0)
-        -m MUTE, --mute MUTE  mute the emulated audio. 0 = unmuted (default for PyGame), 1 = muted (default for Curses)
+        -m {0,1}, --mute {0,1}
+                              mute the emulated audio. 0 = unmuted (default for PyGame), 1 = muted (default for Curses)
         -k KEYMAP, --keymap KEYMAP
                               redefine the 16 keyscan codes (PyGame) or character numbers (Curses). Separate each decimal with a comma
         --curses_cursor_mode {0,1,2}
@@ -89,16 +90,16 @@ Command-line Parameters
                               redefine up to 16 colours for the PyGame renderer in comma-separated hex, e.g. 1234ABCD,F987654E,.. etc.
         --curses_palette CURSES_PALETTE
                               redefine up to 16 colours for the Curses renderer using an octal sequence, e.g. 1234567013572460
-        --load_quirks {0,1}   manually disable or enable CPU load quirks.
-        --shift_quirks {0,1}  manually disable or enable CPU shift quirks.
-        --logic_quirks {0,1}  manually disable or enable CPU logic quirks.
+        --load_quirks {0,1}   manually disable or enable CPU load quirks
+        --shift_quirks {0,1}  manually disable or enable CPU shift quirks
+        --logic_quirks {0,1}  manually disable or enable CPU logic quirks
         --index_overflow_quirks {0,1}
-                              manually disable or enable CPU index overflow quirks.
+                              manually disable or enable CPU index overflow quirks
         --index_increment_quirks {0,1}
-                              manually disable or enable CPU index increment quirks.
-        --jump_quirks {0,1}   manually disable or enable CPU jump quirks.
+                              manually disable or enable CPU index increment quirks
+        --jump_quirks {0,1}   manually disable or enable CPU jump quirks
         --screen_wrap_quirks {0,1}
-                              manually disable or enable screen wrap quirks.
+                              manually disable or enable screen wrap quirks
         -d, --debug           enable live debug output. Only visible in PyGame renderer during play. Slows CPU execution
 
 Emulated Hardware

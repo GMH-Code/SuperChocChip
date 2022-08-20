@@ -64,6 +64,9 @@ class Renderer(RendererBase):
 
         super().__init__(scale, use_colour)
 
+    def __del__(self):
+        pygame.quit()
+
     def set_resolution(self, width, height):
         self.render_surface = pygame.Surface((width, height))
         self.render_surface.fill(self.colour_map[0])
