@@ -532,14 +532,12 @@ class CPU:
         if self.live_debug:
             self.debug("DRW V{:01x}, V{:01x}, 0x{:01x}".format(self.vx, self.vy, height))
 
-        superchip_large_sprite = (height == 0 and self.arch >= ARCH_SUPERCHIP_1_0)
-
-        if superchip_large_sprite:
-            # Show 8x16 if Super-CHIP and low res, or 16x16 if Super-CHIP and high res
+        if height == 0 and self.arch >= ARCH_SUPERCHIP_1_0:
+            # Super-CHIP sprite.  Show 8x16 if low res, otherwise 16x16
             height = 16
             width = 8 if self.lo_res else 16
         else:
-            # A standard non-Super-CHIP sprite
+            # Standard non-Super-CHIP sprite
             width = 8
 
         # The sprite's start always wraps regardless of architecture.
@@ -864,8 +862,9 @@ class CPU:
             # Return without doing anything if we don't have a proper audio driver
             return
 
-        buffer = self.ram.read_block(self.i, 16)
-        self.audio.set_buffer(buffer)
+        # There is a very unlikely chance this buffer copy may hit the end of RAM.  If it does, the audio buffer will
+        # simply only be partially used.  This situation is not worth catching.
+        self.audio.set_buffer(self.ram.read_block(self.i, 16))
 
     def _Fx3A(self):  # XPR
         if self.live_debug:
