@@ -37,3 +37,6 @@ class Renderer:
 
     def set_title(self, title):
         pass
+
+    def shutdown(self):
+        pass

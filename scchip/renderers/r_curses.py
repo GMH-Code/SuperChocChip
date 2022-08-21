@@ -76,11 +76,8 @@ class Renderer(RendererBase):
         super().__init__(scale, use_colour)
 
     def __del__(self):
-        if self.pad:
-            del self.pad
-
-        curses.resetty()
-        curses.endwin()
+        # PyPy does not call this, but regular CPython does
+        self.shutdown()
 
     def set_resolution(self, width, height):
         adjusted_width = width * self.scale + 1
@@ -135,6 +132,17 @@ class Renderer(RendererBase):
                 self.refresh_needed = True
 
         super().set_title(title)
+
+    def shutdown(self):
+        if self.screen:
+            if self.pad:
+                del self.pad
+
+            curses.resetty()
+            curses.endwin()
+            self.screen = None
+
+        super().shutdown()
 
     # No Superclass for these Curses-specific methods
 

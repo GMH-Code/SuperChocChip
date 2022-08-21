@@ -28,6 +28,7 @@ class Renderer(RendererBase):
             scale = 512  # Default window width if not supplied, or set to default
 
         pygame.init()
+        self.pygame_running = True
         self.set_title("Starting...")  # Perhaps an icon would be nice, too?
         self.pixel_array = None
         self.scaled_size = (scale, scale // 2)
@@ -65,7 +66,7 @@ class Renderer(RendererBase):
         super().__init__(scale, use_colour)
 
     def __del__(self):
-        pygame.quit()
+        self.shutdown()
 
     def set_resolution(self, width, height):
         self.render_surface = pygame.Surface((width, height))
@@ -100,3 +101,10 @@ class Renderer(RendererBase):
 
     def _set_pixel_array(self):
         self.pixel_array = pygame.PixelArray(self.render_surface)
+
+    def shutdown(self):
+        if self.pygame_running:
+            pygame.quit()
+            self.pygame_running = False
+
+        super().shutdown()
