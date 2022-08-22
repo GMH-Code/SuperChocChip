@@ -18,6 +18,9 @@ Additionally, the last character 'seen' is stored.  There is a 'reset' switch
 for this, which has to be called before checking.
 
 We will also quit if ESC (char 27) or CTRL+C (char 3) is detected.
+
+Note that using the 'nodelay(True)' setting instead of blocking inside a thread
+is slightly slower, and can lag, due to constant external calls.
 """
 
 __copyright__ = "Copyright (C) 2022 Gregory Maynard-Hoare"
@@ -37,7 +40,7 @@ def input_thread(thread_quitter_queue, input_queue, keymap_dict, curses_screen):
     while thread_quitter_queue.empty():
         # This blocks the thread from proceeding, so it won't get the quit message until at least one key is pressed.
         # However, if set as a daemon thread, it should be terminated when the main thread shuts down.
-        char = curses_screen.getch()
+        char = ord(chr(curses_screen.getch()).lower())
 
         if char == 27 or char == 3:  # Detect ESC or CTRL+C
             input_queue.put(None, block=True)
@@ -50,9 +53,6 @@ def input_thread(thread_quitter_queue, input_queue, keymap_dict, curses_screen):
                 input_queue.put(keymap_char, block=False)
             except queue.Full:
                 pass
-            else:
-                if keymap_char is None:
-                    break
 
 
 class Inputs(InputsBase):
@@ -62,7 +62,7 @@ class Inputs(InputsBase):
         for key_num in range(0x10):
             self.key_timers[key_num] = 0.0
 
-        super().__init__(keymap, renderer)
+        super().__init__(keymap, renderer, force_lowercase=True)
 
         self.thread_quitter_queue = queue.Queue(1)  # Used to inform the thread it should quit
         self.input_queue = queue.Queue(16)
@@ -84,6 +84,9 @@ class Inputs(InputsBase):
             self.thread_quitter_queue.put(None, block=False)
         except queue.Full:
             # Something else has already requested the thread quits
+            pass
+        except AttributeError:
+            # Thread quitter queue not defined yet
             pass
 
         # Don't wait for the thread to quit (because this is likely to happen after a keypress)

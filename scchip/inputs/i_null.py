@@ -16,7 +16,7 @@ class InputsError(Exception):
 
 
 class Inputs:
-    def __init__(self, keymap, renderer):
+    def __init__(self, keymap, renderer, force_lowercase=False):
         self.keymap_dict = {}
         self.renderer = renderer
         keymap_split = keymap.split(",")
@@ -25,13 +25,19 @@ class Inputs:
             raise InputsError("Incorrect number of keys defined -- 16 required.  Use commas to split numbers")
 
         for key_num, key_defined in enumerate(keymap_split):
-            if key_defined in self.keymap_dict:
-                raise InputsError("Duplicate keys defined")
-
             try:
-                self.keymap_dict[int(key_defined)] = key_num
+                key_defined_ord = int(key_defined)
             except ValueError:
                 raise InputsError("Defined keys are not all integer values") from None
+
+            if force_lowercase:
+                # If we are working with characters rather than keyscan codes, we should convert to lowercase
+                key_defined_ord = ord(chr(key_defined_ord).lower())
+
+            if key_defined_ord in self.keymap_dict:
+                raise InputsError("Duplicate keys defined")
+
+            self.keymap_dict[key_defined_ord] = key_num
 
         self.last_keypress = None
 
