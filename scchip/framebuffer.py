@@ -43,6 +43,7 @@ class Framebuffer():
         self.vid_width = 0
         self.vid_height = 0
         self.vid_size = 0
+        self.vid_cache = RAM()
         self.ram_banks = []
         self.report_perf()
 
@@ -68,6 +69,7 @@ class Framebuffer():
         self.vid_width = vid_width
         self.vid_height = vid_height
         self.vid_size = self.vid_width * self.vid_height
+        self.vid_cache.resize(self.vid_size)
 
         for ram_bank in self.ram_banks:
             ram_bank.resize(self.vid_size)  # Update RAM size
@@ -117,7 +119,9 @@ class Framebuffer():
             if self.ram_banks[plane_num].read(vram_loc):
                 colour += 2 ** plane_num
 
-        self.renderer.set_pixel(x, y, colour)
+        if self.vid_cache.read(vram_loc) != colour:
+            self.renderer.set_pixel(x, y, colour)
+            self.vid_cache.write(vram_loc, colour)
 
     # Half-pixel vertical scrolling is unsupported in 64x32 pixel mode
 
@@ -180,7 +184,7 @@ class Framebuffer():
         self._post_scroll()
 
     def _post_scroll(self):
-        # Redraw whole screen after a scroll (slow and nasty)
+        # Redraw whole screen after a scroll.  The video cache should take the load off the renderer a bit
         for y in range(self.vid_height):
             for x in range(self.vid_width):
                 self._render_pixel(x, y)
