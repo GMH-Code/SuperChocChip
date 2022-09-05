@@ -17,8 +17,12 @@ from os import path
 class Loader:
     def load_binary(self, filename):
         f = open(filename, "rb")
-        data = f.read()
-        f.close()
+
+        try:
+            data = f.read()
+        finally:
+            f.close()
+
         return data
 
     def load_system_font(self, filename):

@@ -28,6 +28,9 @@ class Audio:
         # Change the emulated 1-bit (16 length) sound sample
         pass
 
+    def shutdown(self):
+        pass
+
     def is_null(self):
         # Only the null audio device should return True
         return True

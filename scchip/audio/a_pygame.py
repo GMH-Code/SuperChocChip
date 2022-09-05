@@ -64,6 +64,12 @@ class Audio(AudioBase):
             # If the buffer has been replaced before the sound has been disabled, play the new sample now
             self.sound.play(-1)
 
+    def shutdown(self):
+        if self.sound:
+            self.sound.stop()
+
+        super().shutdown()
+
     def is_null(self):
         # Only the null audio device should return True
         return False

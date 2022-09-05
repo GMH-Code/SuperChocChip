@@ -154,4 +154,6 @@ def main(args):
     cpu.run(0x200)
 
     # The CPU has quit, so shut down the rendering framework.  __del__ cannot be relied upon when using PyPy
+    audio.shutdown()
+    inputs.shutdown()
     renderer.shutdown()

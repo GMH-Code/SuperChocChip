@@ -52,3 +52,6 @@ class Inputs:
 
     def get_keypress(self):
         return None  # No keys down
+
+    def shutdown(self):
+        pass

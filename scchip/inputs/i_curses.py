@@ -80,17 +80,7 @@ class Inputs(InputsBase):
         self.thread.start()
 
     def __del__(self):
-        try:
-            self.thread_quitter_queue.put(None, block=False)
-        except queue.Full:
-            # Something else has already requested the thread quits
-            pass
-        except AttributeError:
-            # Thread quitter queue not defined yet
-            pass
-
-        # Don't wait for the thread to quit (because this is likely to happen after a keypress)
-        # self.thread.join()
+        self.shutdown()
 
     def process_messages(self):
         # Deal with any keys pressed
@@ -119,3 +109,19 @@ class Inputs(InputsBase):
 
     def get_keypress(self):
         return self.last_keypress
+
+    def shutdown(self):
+        try:
+            self.thread_quitter_queue.put(None, block=False)
+        except queue.Full:
+            # Something else has already requested the thread quits
+            pass
+        except AttributeError:
+            # Thread quitter queue not defined yet
+            pass
+
+        # Don't wait for the thread to quit (because this is likely to happen after a keypress)
+        # else:
+        #     self.thread.join()
+
+        super().shutdown()
