@@ -33,7 +33,7 @@ One command will start the emulator with the default (and most compatible) setti
 
 Replace `python3` with `python` or `py` if that does not work.  You can also use PyPy (a Just-In-Time compiler), for a huge speed boost.
 
-You can play games in either PyGame (a fast SDL Desktop Window) or Curses (the Terminal).  PyGame will be used for graphics, inputs, and sound, if it is available.  This is highly recommended, as it is far more responsive for keypresses, draws faster, and looks better.  The Terminal has to use up a lot of space to draw graphics, key presses/releases are simulated from character inputs, and it can also only produce basic beeps, whereas PyGame can output sampled sound.  Using the Terminal does, however, mean you can play emulated games over SSH.
+You can play games in either PyGame (a fast SDL Desktop Window) or Curses (the Terminal).  PyGame will be used for graphics, inputs, and sound, if it is available.  This is highly recommended, as it is far more responsive for key presses, draws faster, and looks better.  The Terminal has to use up a lot of space to draw graphics, key presses/releases are simulated from character inputs, and it can also only produce basic beeps, whereas PyGame can output sampled sound.  Using the Terminal does, however, mean you can play emulated games over SSH.
 
 For some older games, you might find you need to play with the command line settings, especially the quirks, to find out what works.  Many games have been written over the years for various emulators with different behaviours, some which did not follow original specifications quite correctly.  I've tried to cover as many of these quirks as possible.
 
@@ -118,7 +118,7 @@ Depending on the hardware/modes chosen in the emulator, included is:
 - 1x 16-bit index register (address storage)
 - 1x 12-bit program counter
 - 1x main system clock
-- 2x independent delay/sound hardware timers
+- 2x independent delay / sound hardware timers
 - 1x video timer
 - 1x video framebuffer, supporting multiple planes / VRAM banks
 - 2x video blitters, supported via plugin
@@ -131,7 +131,7 @@ Supported Features
 
 - Large, small, and colour sprites.  ROMs which make use of 4 planes (16-colours) are also supported, even though the specification on this is still unofficial.
 - Fast 4-way scrolling.
-- The extra video timer is set to 60Hz, which ensures unnecessary rendering and flickering doesn't occur.  Modern games which use the delay timer to provide VSync emulation are supported.
+- The extra video timer is set to 60Hz, which ensures unnecessary rendering and flickering doesn't occur.  Modern games that use the delay timer to provide VSync emulation are supported.
 - Performance monitoring output (frames drawn and instructions executed per second).
 - Live visual disassembly of OpCodes/instructions about to be run (disabled by default, unless a CPU exception occurs).
 - The input and rendering modules can be swapped for your own creations.  In theory, you can make a game run on almost any custom display and keypad.
@@ -154,7 +154,7 @@ Notes
 
 ### Code Optimisation
 
-- Loops or condition blocks are avoided whereever possible to optimise emulation speed.  For example, this CPU uses bitmasks and hashed dictionaries to find the right opcodes, rather than huge conditions and switch (C/C++) statements.
+- Loops or condition blocks are avoided wherever possible to optimise emulation speed.  For example, this CPU uses bitmasks and hashed dictionaries to find the right OpCodes, rather than huge conditions and switch (C/C++) statements.
 - There are a few portions of the CPU code that are a bit repetitive, for example the checks to see if the debugger is active on each instruction.  This is preferred to the shorter, but slower method (calling unified debug functionality and then checking to see if the debugger is active before returning).
 
 ### Quirks
@@ -173,14 +173,14 @@ Future Expansion
 
 - The CPU testing is okay, but it'd be nice to have full testing for all quirk combinations.
 - Ideally, we should have 100% testing coverage across the board.
-- The test ROMs could be automatically validated as part of the tests, which would be nice.  This will require halting the CPU after a specified number of cycles and then verifying a SHA checksum of the Framebuffer VRAM banks against an expected value.
-- Snapshots (save states) and saving/restoring of RPL registers to/from disk.  I'm not so bothered about this at the moment, but some games, such as RPGs, are becoming longer to play, so saving your progress would be good to have.
+- The test ROMs could be automatically validated as part of the tests, which would be nice.  This will require halting the CPU after a specified number of cycles and then verifying a SHA checksum of the framebuffer VRAM banks against an expected value.
+- Snapshots (save states) and saving/restoring of RPL registers to/from disk.  I'm not so bothered about this right now, but some games, such as RPGs, are becoming longer to play, so saving your progress would be good to have.
 - Per-game saved configuration of palette(s) and quirks, at least.
 
 Extending
 ---------
 
-- This program has three Input and Rendering plugins.  It is possible, and quite easy, to write your own Inputs or Renderers if you want, (for example) to write to a small LED display instead of the Desktop or Terminal and control that using your own custom keypad.  This could probably be done with MicroPython, since the core of this program does not rely on any special Python libraries.
+- This program has plugins for Rendering, Input, and Audio.  Each of these are supplied for *PyGame*, *Curses* and *Null* frameworks.  You can modify or extend these plugins to write interfaces for your own devices.  For example, you could draw to a small LED display instead of the Desktop or Terminal and control that using your own custom keypad.  This could probably be done with MicroPython, since the core of this program does not rely on any special Python libraries.
 
 License
 -------
