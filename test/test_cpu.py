@@ -447,11 +447,11 @@ class TestCPU(unittest.TestCase):
     def test_cpu_fx02(self):  # XSTA
         # Only F002 is valid, so check F102 throws exception
         self.assertRaises(CPUError, self._check_opcode, 0xF102)
-        # Unsupported, so just check call executes
+        # For now, just check call executes
         self._check_opcode(0xF002)
 
-    def test_cpu_fx3a(self):  # XPR
-        # Unsupported, so just check call executes
+    def test_cpu_fx3a(self):  # XPR Vx
+        # For now, just check call executes
         self._check_opcode(0xF13A)
 
     # Tests for other CPU architecture quirks

@@ -549,7 +549,6 @@ class CPU:
         rows_collided = 0
         i = self.i
 
-        # NOTE: Unsure: Should we render sprites which have starting co-ordinates outside the screen area?
         for affected_plane in self.framebuffer.get_affected_planes():
             for y in range(height):
                 spr_data = (
@@ -866,7 +865,7 @@ class CPU:
         # simply only be partially used.  This situation is not worth catching.
         self.audio.set_buffer(self.ram.read_block(self.i, 16))
 
-    def _Fx3A(self):  # XPR
+    def _Fx3A(self):  # XPR Vx
         if self.live_debug:
             self.debug("XPR V{:01x}".format(self.vx))
 
