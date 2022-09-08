@@ -20,7 +20,7 @@ class TestLoader(unittest.TestCase):
         )
 
         self.assertEqual(
-            "f5389e19e1b3b14cc2f0c836effccaf03b9ef8e0b1348bcc432e39e06d72e3df",
+            "ea9ca55c60a0beca09889537e7be19be2052ff5db36d3f4e5057e6df5c00a5e3",
             sha256(self.loader.load_system_font("16")).hexdigest()
         )
 
