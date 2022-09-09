@@ -5,7 +5,7 @@ __license__ = "GNU Affero General Public License v3.0"
 
 # App identification
 APP_NAME = "SuperChocChip Emulator"
-APP_VERSION = "1.2.2"
+APP_VERSION = "1.2.5"
 APP_COPYRIGHT = "Copyright (C) 2022 Gregory Maynard-Hoare, licensed under GNU Affero General Public License v3.0"
 APP_INTRO = "{} V{} -- ".format(APP_NAME, APP_VERSION)
 
@@ -32,4 +32,4 @@ SUPPORTED_CPUS = {
 }
 
 # CPU quirks (not including display wrapping)
-CPU_QUIRKS = ["load", "shift", "logic", "index_overflow", "index_increment", "jump"]
+CPU_QUIRKS = ["load", "shift", "logic", "index_overflow", "index_increment", "jump", "sprite_delay"]

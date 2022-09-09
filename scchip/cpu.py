@@ -32,7 +32,7 @@ class CPUError(Exception):
 class CPU:
     def __init__(self, arch, ram, stack, framebuffer, inputs, audio, debugger, clock_speed=None, load_quirks=None,
                  shift_quirks=None, logic_quirks=None, index_overflow_quirks=None, index_increment_quirks=None,
-                 jump_quirks=None):
+                 jump_quirks=None, sprite_delay_quirks=None):
 
         self.arch = arch
         self.ram = ram
@@ -76,6 +76,7 @@ class CPU:
             (arch == ARCH_CHIP48) if index_increment_quirks is None else index_increment_quirks
         )
         self.jump_quirks = arch_is_schip if jump_quirks is None else jump_quirks
+        self.sprite_delay_quirks = (arch == ARCH_CHIP8) if sprite_delay_quirks is None else sprite_delay_quirks
 
         # Define instruction pointers.
         # n = Nibble
@@ -197,6 +198,7 @@ class CPU:
         # Display-related vars
         self.framebuffer.resize_vid(64, 32)
         self.lo_res = True
+        self.vblank_wait = False  # CHIP-8 vertical blanking support
 
         # Input-related vars
         self.awaiting_keypress = False
@@ -254,13 +256,22 @@ class CPU:
             self.inc_pc()  # Program counter updates after fetch (and technically before decode), but before execute
             self.decode_exec()
 
+            if self.vblank_wait:
+                # If we're using the original CHIP-8 system and a sprite was drawn, wait for vertical blank interrupt
+                next_time = self.next_display_update_time
+
+                while perf_counter() < next_time:
+                    pass
+
+                self.vblank_wait = False
+
             if self.core_interval is not None:
                 # Wait for next CPU instruction.  Do this last for maximum precision (takes into account time spent on
                 # this instruction)
                 next_time = this_time + self.core_interval
 
-                while this_time < next_time:  # Unfortunately we have to do this to get the timing right
-                    this_time = perf_counter()
+                while perf_counter() < next_time:  # Unfortunately we have to do this to get the timing right
+                    pass
 
             self.perf_counter_ops += 1
 
@@ -582,6 +593,10 @@ class CPU:
 
         # Super-CHIP 1.1 and above reports number of rows collided
         self.v[0xF] = int(rows_collided > 0) if self.arch < ARCH_SUPERCHIP_1_1 else rows_collided
+
+        # Wait for vertical blanking interrupt.  Normally only used if emulating original CHIP-8 system
+        if self.sprite_delay_quirks:
+            self.vblank_wait = True
 
     def _Ex9E(self):  # SKP Vx
         if self.live_debug:

@@ -3,7 +3,7 @@
 __author__ = "Gregory Maynard-Hoare"
 __copyright__ = "Copyright (C) 2022 Gregory Maynard-Hoare"
 __license__ = "GNU Affero General Public License v3.0"
-__version__ = "1.2.2"
+__version__ = "1.2.5"
 
 from argparse import ArgumentParser
 from scchip import main
@@ -57,16 +57,12 @@ def parse_args():
         help="redefine up to 16 colours for the Curses renderer using an octal sequence, e.g. 1234567013572460"
     )
 
-    for cpu_quirk in CPU_QUIRKS:
+    for sys_quirk in CPU_QUIRKS + ["screen_wrap"]:
         parser.add_argument(
-            "--{}_quirks".format(cpu_quirk), type=int, choices=[0, 1],
-            help="manually disable or enable CPU {} quirks".format(cpu_quirk.replace("_", " "))
+            "--{}_quirks".format(sys_quirk), type=int, choices=[0, 1],
+            help="manually disable or enable {} quirks".format(sys_quirk.replace("_", " "))
         )
 
-    parser.add_argument(
-        "--screen_wrap_quirks", type=int, choices=[0, 1],
-        help="manually disable or enable screen wrap quirks"
-    )
     parser.add_argument(
         "-d", "--debug", action="store_true", default=False,
         help="enable live debug output.  Only visible in PyGame renderer during play.  Slows CPU execution"

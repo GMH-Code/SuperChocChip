@@ -62,7 +62,7 @@ Command-line Parameters
 -----------------------
 
     Usage:
-        superchocchip.py [-h] [-a {chip8,schip1.0,chip48,schip1.1,xochip,xochip16}] [-c CLOCK_SPEED] [-r {pygame,curses,null}] [-s SCALE] [-f SMOOTHING] [-m {0,1}] [-k KEYMAP] [--curses_cursor_mode {0,1,2}] [--pygame_palette PYGAME_PALETTE] [--curses_palette CURSES_PALETTE] [--load_quirks {0,1}] [--shift_quirks {0,1}] [--logic_quirks {0,1}] [--index_overflow_quirks {0,1}] [--index_increment_quirks {0,1}] [--jump_quirks {0,1}] [--screen_wrap_quirks {0,1}] [-d]
+        superchocchip.py [-h] [-a {chip8,schip1.0,chip48,schip1.1,xochip,xochip16}] [-c CLOCK_SPEED] [-r {pygame,curses,null}] [-s SCALE] [-f SMOOTHING] [-m {0,1}] [-k KEYMAP] [--curses_cursor_mode {0,1,2}] [--pygame_palette PYGAME_PALETTE] [--curses_palette CURSES_PALETTE] [--load_quirks {0,1}] [--shift_quirks {0,1}] [--logic_quirks {0,1}] [--index_overflow_quirks {0,1}] [--index_increment_quirks {0,1}] [--jump_quirks {0,1}] [--sprite_delay_quirks {0,1}] [--screen_wrap_quirks {0,1}] [-d]
         filename
 
     Positional arguments:
@@ -90,14 +90,16 @@ Command-line Parameters
                               redefine up to 16 colours for the PyGame renderer in comma-separated hex, e.g. 1234ABCD,F987654E,.. etc.
         --curses_palette CURSES_PALETTE
                               redefine up to 16 colours for the Curses renderer using an octal sequence, e.g. 1234567013572460
-        --load_quirks {0,1}   manually disable or enable CPU load quirks
-        --shift_quirks {0,1}  manually disable or enable CPU shift quirks
-        --logic_quirks {0,1}  manually disable or enable CPU logic quirks
+        --load_quirks {0,1}   manually disable or enable load quirks
+        --shift_quirks {0,1}  manually disable or enable shift quirks
+        --logic_quirks {0,1}  manually disable or enable logic quirks
         --index_overflow_quirks {0,1}
-                              manually disable or enable CPU index overflow quirks
+                              manually disable or enable index overflow quirks
         --index_increment_quirks {0,1}
-                              manually disable or enable CPU index increment quirks
-        --jump_quirks {0,1}   manually disable or enable CPU jump quirks
+                              manually disable or enable index increment quirks
+        --jump_quirks {0,1}   manually disable or enable jump quirks
+        --sprite_delay_quirks {0,1}
+                              manually disable or enable sprite delay quirks
         --screen_wrap_quirks {0,1}
                               manually disable or enable screen wrap quirks
         -d, --debug           enable live debug output. Only visible in PyGame renderer during play. Slows CPU execution
@@ -139,6 +141,7 @@ Supported Features
 - Redefinable palettes, in both PyGame and Curses renderers.  In the Curses renderer, you can choose which of the 8 colours are allocated to each of the 16 colours in the emulator.
 - Scale2x (high quality) smoothing in the PyGame renderer, off by default.
 - Realtime audio, capable of playing both basic beeps and XO-CHIP sound/music.
+- Passes all tests in every test ROM I could find, when started with the appropriate parameters.
 
 Notes
 -----
