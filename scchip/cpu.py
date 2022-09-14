@@ -477,14 +477,18 @@ class CPU:
 
         self._post_8xy5_8xy7(self.v[self.vx] - self.v[self.vy])
 
+    def _debug_8xy6_8xyE(self, direction):
+        self.debug(
+            "{} V{:01x}".format(direction, self.vx) if self.shift_quirks else
+            "{} V{:01x}, V{:01x}".format(direction, self.vx, self.vy)
+        )
+
     def _8xy6(self):  # SHR Vx {, Vy}
         # On Super-CHIP, Vx is used.  On CHIP-8 and XO-CHIP, Vy is used.
-        vr = self.vx if self.shift_quirks else self.vy
-
         if self.live_debug:
-            self.debug("SHR V{:01x}".format(vr))
+            self._debug_8xy6_8xyE("SHR")
 
-        val = self.v[vr]
+        val = self.v[self.vx if self.shift_quirks else self.vy]
         self.v[self.vx] = val >> 1  # Apparently the result is put in Vx either way
         self.v[0xF] = val & 1  # The whole byte gets set just for the flag
 
@@ -496,14 +500,12 @@ class CPU:
 
     def _8xyE(self):  # SHL Vx {, Vy}
         # On Super-CHIP, Vx is used.  On CHIP-8 and XO-CHIP, Vy is used.
-        vr = self.vx if self.shift_quirks else self.vy
-
         if self.live_debug:
-            self.debug("SHL V{:01x}".format(vr))
+            self._debug_8xy6_8xyE("SHL")
 
-        byte = self.v[vr]
-        self.v[self.vx] = (byte << 1) & 0xFF
-        self.v[0xF] = byte >> 7
+        val = self.v[self.vx if self.shift_quirks else self.vy]
+        self.v[self.vx] = (val << 1) & 0xFF
+        self.v[0xF] = val >> 7
 
     def _9xy0(self):  # SNE Vx, Vy
         if self.live_debug:
