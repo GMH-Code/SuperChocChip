@@ -823,26 +823,30 @@ class CPU:
     def _5xy2(self):  # XST Vx, Vy
         vx = self.vx
         vy = self.vy
-        i = self.i
-        i_bitmask = self.i_bitmask
 
         if self.live_debug:
             self.debug("XST V{:01x}, V{:01x}".format(vx, vy))
 
-        for offset in range(vy - vx + 1):
-            self.ram.write((i + offset) & i_bitmask, self.v[vx + offset])
+        i = self.i
+        i_bitmask = self.i_bitmask
+        iter_back = vx > vy
+
+        for offset in range(vx - vy + 1) if iter_back else range(vy - vx + 1):
+            self.ram.write((i + offset) & i_bitmask, self.v[(vx - offset) if iter_back else (vx + offset)])
 
     def _5xy3(self):  # XLD Vx, Vy
         vx = self.vx
         vy = self.vy
-        i = self.i
-        i_bitmask = self.i_bitmask
 
         if self.live_debug:
             self.debug("XLD V{:01x}, V{:01x}".format(vx, vy))
 
-        for offset in range(vy - vx + 1):
-            self.v[vx + offset] = self.ram.read((i + offset) & i_bitmask)
+        i = self.i
+        i_bitmask = self.i_bitmask
+        iter_back = vx > vy
+
+        for offset in range(vx - vy + 1) if iter_back else range(vy - vx + 1):
+            self.v[(vx - offset) if iter_back else (vx + offset)] = self.ram.read((i + offset) & i_bitmask)
 
     def _Fx00(self):  # XLDL I, addr
         # Only F000 is supported

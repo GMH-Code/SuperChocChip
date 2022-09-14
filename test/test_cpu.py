@@ -419,20 +419,36 @@ class TestCPU(unittest.TestCase):
 
         self.cpu.i = 0xFFFF
         self._check_opcode(0x5232)
+        self.assertEqual(0, self.ram.read(0xFFFE))
         self.assertEqual(2, self.ram.read(0xFFFF))
         self.assertEqual(3, self.ram.read(0x0000))
         self.assertEqual(0, self.ram.read(0x0001))
 
+        # Test register store reversal
+        self._check_opcode(0x5322)
+        self.assertEqual(0, self.ram.read(0xFFFE))
+        self.assertEqual(3, self.ram.read(0xFFFF))
+        self.assertEqual(2, self.ram.read(0x0000))
+        self.assertEqual(0, self.ram.read(0x0001))
+
     def test_cpu_5xy3(self):  # XLD Vx, Vy
         for i in range(3, 7):
-            self.ram.write((0xFFFC + i) & 0xFFFF, i)
+            self.ram.write((0xFFFB + i) & 0xFFFF, i)
 
-        self.assertEqual(3, self.ram.read(0xFFFF))
-        self.assertEqual(4, self.ram.read(0x0000))
-        self.assertEqual(5, self.ram.read(0x0001))
+        self.assertEqual(4, self.ram.read(0xFFFF))
+        self.assertEqual(5, self.ram.read(0x0000))
+        self.assertEqual(6, self.ram.read(0x0001))
         self.cpu.i = 0xFFFF
         self._check_opcode(0x5233)
-        self.assertEqual(3, self.cpu.v[2])
+        self.assertEqual(0, self.cpu.v[1])
+        self.assertEqual(4, self.cpu.v[2])
+        self.assertEqual(5, self.cpu.v[3])
+        self.assertEqual(0, self.cpu.v[4])
+
+        # Test register load reversal
+        self._check_opcode(0x5323)
+        self.assertEqual(0, self.cpu.v[1])
+        self.assertEqual(5, self.cpu.v[2])
         self.assertEqual(4, self.cpu.v[3])
         self.assertEqual(0, self.cpu.v[4])
 
