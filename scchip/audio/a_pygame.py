@@ -27,15 +27,13 @@ class Audio(AudioBase):
         self.buffer = memoryview(bytearray(128))  # 16 bit buffer * 8 bit output
         self.buzzer_enabled = False
         self.sound = None
+        pygame.mixer.pre_init(size=-8, channels=1, buffer=1, allowedchanges=0)
         super().__init__()
 
     def set_frequency(self, frequency):
         # Set PyGame playback rate.  This can be slow if called frequently
         pygame.mixer.quit()
-        pygame.mixer.pre_init(
-            frequency, size=-8, channels=1, buffer=1, allowedchanges=pygame.AUDIO_ALLOW_FREQUENCY_CHANGE
-        )
-        pygame.mixer.init()
+        pygame.mixer.init(round(frequency))
 
     def enable_buzzer(self, enabled):
         # Enable or disable the buzzer, but also play any sounds which may be in the buffer already, or stop any playing

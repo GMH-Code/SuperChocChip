@@ -139,7 +139,7 @@ def main(args):
 
     # Start up the audio system and set a default square beep waveform
     audio = Audio()
-    audio.set_frequency(4000)
+    audio.set_frequency(4000.0)
     audio.set_buffer(memoryview(bytearray((b"\x00\xFF") * 8)))
 
     # Set up non-shared CPU stack in host memory -- 12 levels for CHIP-8 CPUs, 16 for Super-CHIP 1.0 and above
