@@ -66,6 +66,7 @@ class Audio(AudioBase):
         if self.sound:
             self.sound.stop()
 
+        pygame.mixer.quit()
         super().shutdown()
 
     def is_null(self):

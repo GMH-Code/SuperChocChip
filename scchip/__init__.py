@@ -151,9 +151,11 @@ def main(args):
 
     # Create a new CPU, plug it into the rest of the system, and boot it up at the default address
     cpu = CPU(arch, ram, stack, framebuffer, inputs, audio, debugger, clock_speed=args["clock_speed"], **quirk_settings)
-    cpu.run(0x200)
 
-    # The CPU has quit, so shut down the rendering framework.  __del__ cannot be relied upon when using PyPy
-    audio.shutdown()
-    inputs.shutdown()
-    renderer.shutdown()
+    try:
+        cpu.run(0x200)
+    finally:
+        # The CPU has quit, so shut down the rendering framework.  __del__ cannot be relied upon when using PyPy
+        audio.shutdown()
+        inputs.shutdown()
+        renderer.shutdown()
