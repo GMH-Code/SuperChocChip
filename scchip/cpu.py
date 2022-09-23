@@ -604,14 +604,14 @@ class CPU:
         if self.live_debug:
             self.debug("SKP V{:01x}".format(self.vx))
 
-        if self.inputs.is_key_down(self.v[self.vx]):
+        if self.inputs.is_key_down(self.v[self.vx] & 0xF):
             self._post_skip()
 
     def _ExA1(self):  # SKNP Vx
         if self.live_debug:
             self.debug("SKNP V{:01x}".format(self.vx))
 
-        if not self.inputs.is_key_down(self.v[self.vx]):
+        if not self.inputs.is_key_down(self.v[self.vx] & 0xF):
             self._post_skip()
 
     def _Fx07(self):  # LD Vx, DT
