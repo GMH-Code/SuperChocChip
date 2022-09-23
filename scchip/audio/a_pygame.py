@@ -21,19 +21,32 @@ __license__ = "GNU Affero General Public License v3.0"
 import pygame
 from .a_null import Audio as AudioBase
 
+PLAYBACK_FREQUENCY = 44100.0
+DEFAULT_VOLUME = 0.1
+
 
 class Audio(AudioBase):
     def __init__(self):
-        self.buffer = memoryview(bytearray(128))  # 16 bit buffer * 8 bit output
-        self.buzzer_enabled = False
+        self.orig_buffer = None
         self.sound = None
-        pygame.mixer.pre_init(size=-8, channels=1, buffer=1, allowedchanges=0)
+        self.frequency = None
+        self.sample_multiplier = None
+        self.resampled_buffer = None
+        self.resampled_buffer_size = None
+        self.buzzer_enabled = False
+        pygame.mixer.pre_init(int(PLAYBACK_FREQUENCY), size=8, channels=1, buffer=1, allowedchanges=0)
+        pygame.mixer.init()
         super().__init__()
 
     def set_frequency(self, frequency):
-        # Set PyGame playback rate.  This can be slow if called frequently
-        pygame.mixer.quit()
-        pygame.mixer.init(round(frequency))
+        # Setting PyGame's playback rate is very slow, so we must resample audio for it when building the buffer
+        if frequency != self.frequency:
+            self.frequency = frequency
+            self.sample_multiplier = PLAYBACK_FREQUENCY / frequency
+
+            # If the frequency has been changed, and there is a sample in the buffer, resample it now
+            if self.orig_buffer is not None:
+                self.set_buffer()
 
     def enable_buzzer(self, enabled):
         # Enable or disable the buzzer, but also play any sounds which may be in the buffer already, or stop any playing
@@ -44,19 +57,35 @@ class Audio(AudioBase):
 
         self.buzzer_enabled = enabled
 
-    def set_buffer(self, buffer):
-        # Copy the bit-level buffer into PyGame as an extended audio sample
-        buffer_pos = 0
+    def set_buffer(self, buffer=None):
+        # Copy the bit-level buffer into PyGame as an extended audio sample.  If None is supplied for the buffer (such
+        # as when changing sample playback frequency), then the previously supplied one will be used.
 
-        for byte in buffer:
-            for bit in range(7, -1, -1):
-                self.buffer[buffer_pos] = ((byte >> bit) & 1) * 0xFF
-                buffer_pos += 1
+        if buffer is None:
+            buffer = self.orig_buffer
+        else:
+            self.orig_buffer = buffer
+
+        sample_multiplier = self.sample_multiplier
+        resampled_buffer_size = int(128 * sample_multiplier)  # 16-bit (2-byte) input buffer width * 8-bit output height
+
+        # Resize host audio buffer if necessary
+        if resampled_buffer_size != self.resampled_buffer_size:
+            self.resampled_buffer = memoryview(bytearray(resampled_buffer_size))
+            self.resampled_buffer_size = resampled_buffer_size
+
+        # Resample (stretch the width and height of) the emulated square waveform to fit the host buffer
+        for resampled_buffer_pos in range(resampled_buffer_size):
+            buffer_byte_pos = resampled_buffer_pos / sample_multiplier
+            byte = int(buffer_byte_pos / 8.0)
+            bit = 7 - int(buffer_byte_pos % 8.0)
+            self.resampled_buffer[resampled_buffer_pos] = ((buffer[byte] >> bit) & 1) * 0xFF
 
         if self.buzzer_enabled:
             self.sound.stop()
 
-        self.sound = pygame.mixer.Sound(self.buffer)
+        self.sound = pygame.mixer.Sound(self.resampled_buffer)
+        self.sound.set_volume(DEFAULT_VOLUME)
 
         if self.buzzer_enabled:
             # If the buffer has been replaced before the sound has been disabled, play the new sample now
