@@ -20,6 +20,7 @@ __license__ = "GNU Affero General Public License v3.0"
 
 import pygame
 from .r_null import RendererError, Renderer as RendererBase
+from ..constants import APP_NAME
 
 
 class Renderer(RendererBase):
@@ -28,7 +29,7 @@ class Renderer(RendererBase):
             scale = 512  # Default window width if not supplied, or set to default
 
         pygame.display.init()
-        self.set_title("Starting...")  # Perhaps an icon would be nice, too?
+        self.set_title(APP_NAME)  # Perhaps an icon would be nice, too?
         self.pixel_array = None
         self.scaled_size = (scale, scale // 2)
         self.display_surface = pygame.display.set_mode(self.scaled_size, 0, 8)
@@ -72,10 +73,9 @@ class Renderer(RendererBase):
 
     def set_pixel(self, x, y, colour):
         self.pixel_array[x][y] = self.colour_map[colour]
-        super().set_pixel(x, y, colour)
 
-    def refresh_display(self):
-        if self.refresh_needed and self.pixel_array:
+    def refresh_display(self, content_changed=False):
+        if content_changed and self.pixel_array:
             self.pixel_array.close()
             del self.pixel_array
             render_surface = self.render_surface
@@ -89,11 +89,8 @@ class Renderer(RendererBase):
             pygame.display.flip()
             self._set_pixel_array()
 
-        super().refresh_display()
-
     def set_title(self, title):
         pygame.display.set_caption(title)
-        super().set_title(title)
 
     def _set_pixel_array(self):
         self.pixel_array = pygame.PixelArray(self.render_surface)

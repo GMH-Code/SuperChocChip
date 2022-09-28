@@ -45,6 +45,7 @@ class Framebuffer():
         self.vid_size = 0
         self.vid_cache = RAM()
         self.ram_banks = []
+        self.frame_delta = {}
         self.report_perf()
 
         for _ in range(num_planes):
@@ -85,9 +86,7 @@ class Framebuffer():
         for plane in self.affect_planes:
             plane.clear()
 
-        for y in range(self.vid_height):
-            for x in range(self.vid_width):
-                self._render_pixel(x, y)
+        self._redraw_all()
 
     def get_affected_planes(self):
         return self.affect_planes
@@ -120,7 +119,7 @@ class Framebuffer():
                 colour += 2 ** plane_num
 
         if self.vid_cache.read(vram_loc) != colour:
-            self.renderer.set_pixel(x, y, colour)
+            self.frame_delta[(x, y)] = colour
             self.vid_cache.write(vram_loc, colour)
 
     # Half-pixel vertical scrolling is unsupported in 64x32 pixel mode
@@ -137,7 +136,7 @@ class Framebuffer():
             plane.move_mem(-mem_offset)  # Usually moves contents up by 1 pixel, or 0.5 on low resolution
             plane.zero_block(vid_size - mem_offset, mem_offset)  # Erase the bottom strips
 
-        self._post_scroll()
+        self._redraw_all()
 
     def scroll_left(self, cols):
         if not self.affect_planes:
@@ -153,7 +152,7 @@ class Framebuffer():
                 # Erase 4-pixel block to right of line in high resolution, 2 on low resolution
                 plane.zero_block(vid_width * y - cols, cols)
 
-        self._post_scroll()
+        self._redraw_all()
 
     def scroll_right(self, cols):
         if not self.affect_planes:
@@ -169,7 +168,7 @@ class Framebuffer():
                 # Erase 4-pixel block to left of line in high resolution, 2 on low resolution
                 plane.zero_block(vid_width * y, cols)
 
-        self._post_scroll()
+        self._redraw_all()
 
     def scroll_down(self, rows):
         if not self.affect_planes:
@@ -181,16 +180,23 @@ class Framebuffer():
             plane.move_mem(mem_offset)  # Usually moves contents down by 1 pixel, 0.5 on low resolution
             plane.zero_block(0, mem_offset)  # Erase the top strips
 
-        self._post_scroll()
+        self._redraw_all()
 
-    def _post_scroll(self):
+    def _redraw_all(self):
         # Redraw whole screen after a scroll.  The video cache should take the load off the renderer a bit
         for y in range(self.vid_height):
             for x in range(self.vid_width):
                 self._render_pixel(x, y)
 
     def refresh_display(self):
-        self.renderer.refresh_display()
+        # Request the renderer updates altered pixels and then refreshes the display.  This method results in a huge
+        # (around 5x) speed up when using PyPy with graphically-intensive games, and a tiny improvement with CPython.
+        for xy, colour in self.frame_delta.items():
+            self.renderer.set_pixel(*xy, colour)
+
+        content_changed = bool(self.frame_delta)
+        self.frame_delta.clear()
+        self.renderer.refresh_display(content_changed)
 
     def switch_planes(self, mask):
         try:

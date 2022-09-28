@@ -22,18 +22,16 @@ class Renderer:
         self.scale = 1 if scale is None else scale
         self.use_colour = use_colour
         self.set_resolution(0, 0)
-        self.refresh_needed = False
 
     def set_resolution(self, width, height):
         self.width = width
         self.height = height
-        self.refresh_needed = False
 
     def set_pixel(self, x, y, colour):  # pylint: disable=unused-argument
-        self.refresh_needed = True
+        pass
 
-    def refresh_display(self):
-        self.refresh_needed = False
+    def refresh_display(self, content_changed=False):
+        pass
 
     def set_title(self, title):
         pass

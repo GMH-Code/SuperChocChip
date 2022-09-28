@@ -21,6 +21,7 @@ __license__ = "GNU Affero General Public License v3.0"
 import curses
 import _curses
 from .r_null import RendererError, Renderer as RendererBase
+from ..constants import APP_NAME
 
 
 class Renderer(RendererBase):
@@ -92,6 +93,7 @@ class Renderer(RendererBase):
             self.pad.bkgd(" ", curses.color_pair(self.palette_index[0]))
 
         super().set_resolution(width, height)
+        self.set_title(APP_NAME)
 
     def set_pixel(self, x, y, colour):
         if self.palette_index:
@@ -100,14 +102,13 @@ class Renderer(RendererBase):
             curses_colour = curses.A_REVERSE if colour else curses.A_NORMAL
 
         self.pad.addstr(y + 1, x * self.scale, self.pixel_char, curses_colour)
-        super().set_pixel(x, y, colour)
 
-    def refresh_display(self):
+    def refresh_display(self, content_changed=False):
         screen_height, screen_width = self.screen.getmaxyx()  # This doesn't seem to ever change/work on Windows?!
 
         if screen_height == self.last_screen_height and screen_width == self.last_screen_width:
             # Fast delta update
-            if self.refresh_needed:
+            if content_changed:
                 self.pad.refresh(0, 0, 0, 0, screen_height - 1, screen_width - 1)
         else:
             # Screen resolution changed, redraw everything
@@ -121,17 +122,13 @@ class Renderer(RendererBase):
             self.last_screen_height = screen_height
             self.last_screen_width = screen_width
 
-        super().refresh_display()
-
     def set_title(self, title):
         if self.pad:
             title_len = len(title)
 
             if self.width > title_len:
                 self.pad.addstr(0, 0, "".join((title, " " * (self.width * self.scale - title_len))), curses.A_REVERSE)
-                self.refresh_needed = True
-
-        super().set_title(title)
+                self.refresh_display(True)
 
     def shutdown(self):
         if self.screen:
