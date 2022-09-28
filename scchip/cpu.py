@@ -47,8 +47,8 @@ class CPU:
         self.framebuffer.report_perf()
 
         if clock_speed is None:
-            # Default clock speed
-            auto_clock_speed = 0 if arch >= ARCH_SUPERCHIP_1_0 else 1000
+            # Default clock speed, assuming no vertical blank pauses
+            auto_clock_speed = 0 if arch >= ARCH_SUPERCHIP_1_0 else 1200
         else:
             # User-specified clock speed (user can specify 0 for infinite)
             auto_clock_speed = clock_speed
