@@ -49,13 +49,17 @@ class Audio(AudioBase):
                 self.set_buffer()
 
     def enable_buzzer(self, enabled):
-        # Enable or disable the buzzer, but also play any sounds which may be in the buffer already, or stop any playing
-        if enabled:
-            self.sound.play(-1)
-        else:
-            self.sound.stop()
+        # Enable or disable the buzzer, i.e. play or stop buffer playback.  If there is already a sound sample being
+        # played from the buffer, it won't be restarted.
 
-        self.buzzer_enabled = enabled
+        if enabled:
+            if not self.buzzer_enabled:
+                self.sound.play(-1)
+                self.buzzer_enabled = True
+        else:
+            if self.buzzer_enabled:
+                self.sound.stop()
+                self.buzzer_enabled = False
 
     def set_buffer(self, buffer=None):
         # Copy the bit-level buffer into PyGame as an extended audio sample.  If None is supplied for the buffer (such
