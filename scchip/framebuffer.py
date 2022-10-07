@@ -105,22 +105,19 @@ class Framebuffer():
         collision = (pixel != 0)
         new_pixel = pixel ^ 0xFF
         plane.write(vram_loc, new_pixel)
-        self._render_pixel(x, y)
-
+        self._render_pixel(vram_loc)
         return collision
 
-    def _render_pixel(self, x, y):
+    def _render_pixel(self, vram_loc):
         # Render the pixel to the display
-        vram_loc = x + y * self.vid_width
+        ram_banks = self.ram_banks
         colour = 0
 
         for plane_num in range(self.num_planes):
-            if self.ram_banks[plane_num].read(vram_loc):
+            if ram_banks[plane_num].read(vram_loc):
                 colour += 2 ** plane_num
 
-        if self.vid_cache.read(vram_loc) != colour:
-            self.frame_delta[(x, y)] = colour
-            self.vid_cache.write(vram_loc, colour)
+        self.frame_delta[vram_loc] = colour
 
     # Half-pixel vertical scrolling is unsupported in 64x32 pixel mode
 
@@ -184,17 +181,26 @@ class Framebuffer():
 
     def _redraw_all(self):
         # Redraw whole screen after a scroll.  The video cache should take the load off the renderer a bit
-        for y in range(self.vid_height):
-            for x in range(self.vid_width):
-                self._render_pixel(x, y)
+        render_pixel = self._render_pixel
+
+        for vram_loc in range(self.vid_size):
+            render_pixel(vram_loc)
 
     def refresh_display(self):
         # Request the renderer updates altered pixels and then refreshes the display.  This method results in a huge
         # (around 5x) speed up when using PyPy with graphically-intensive games, and a tiny improvement with CPython.
-        for xy, colour in self.frame_delta.items():
-            self.renderer.set_pixel(*xy, colour)
+        vid_width = self.vid_width
+        vid_cache_read = self.vid_cache.read
+        vid_cache_write = self.vid_cache.write
+        renderer_set_pixel = self.renderer.set_pixel
+        content_changed = False
 
-        content_changed = bool(self.frame_delta)
+        for vram_loc, colour in self.frame_delta.items():
+            if vid_cache_read(vram_loc) != colour:
+                renderer_set_pixel(vram_loc % vid_width, vram_loc // vid_width, colour)
+                vid_cache_write(vram_loc, colour)
+                content_changed = True
+
         self.frame_delta.clear()
         self.renderer.refresh_display(content_changed)
 
