@@ -796,7 +796,7 @@ class CPU:
         scroll_distance = self.nibble
 
         if self.live_debug:
-            self.debug("SCD {:01x}".format(scroll_distance))
+            self.debug("SCD 0x{:01x}".format(scroll_distance))
 
         if self.lo_res:
             if scroll_distance & 1:
@@ -812,7 +812,7 @@ class CPU:
         scroll_distance = self.nibble
 
         if self.live_debug:
-            self.debug("SCU {:01x}".format(scroll_distance))
+            self.debug("SCU 0x{:01x}".format(scroll_distance))
 
         if self.lo_res:
             if scroll_distance & 1:
