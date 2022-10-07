@@ -66,13 +66,14 @@ class Renderer(RendererBase):
         super().__init__(scale, use_colour)
 
     def set_resolution(self, width, height):
+        self._del_pixel_array()
         self.render_surface = pygame.Surface((width, height))
         self.render_surface.fill(self.colour_map[0])
         self._set_pixel_array()
         super().set_resolution(width, height)
 
     def set_pixel(self, x, y, colour):
-        self.pixel_array[x][y] = self.colour_map[colour]
+        self.pixel_array[x, y] = self.colour_map[colour]
 
     def refresh_display(self, content_changed=False):
         if content_changed and self.pixel_array:
@@ -95,7 +96,13 @@ class Renderer(RendererBase):
     def _set_pixel_array(self):
         self.pixel_array = pygame.PixelArray(self.render_surface)
 
+    def _del_pixel_array(self):
+        if self.pixel_array:
+            self.pixel_array.close()
+            self.pixel_array = None
+
     def shutdown(self):
         # PyGame currently segfaults if display.quit is called via __del__
+        self._del_pixel_array()
         pygame.display.quit()
         super().shutdown()
