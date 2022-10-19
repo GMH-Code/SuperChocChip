@@ -57,10 +57,7 @@ def input_thread(thread_quitter_queue, input_queue, keymap_dict, curses_screen):
 
 class Inputs(InputsBase):
     def __init__(self, keymap, renderer):
-        self.key_timers = {}
-
-        for key_num in range(0x10):
-            self.key_timers[key_num] = 0.0
+        self.key_timers = [0.0] * 0x10
 
         super().__init__(keymap, renderer, force_lowercase=True)
 

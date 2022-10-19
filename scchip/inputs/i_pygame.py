@@ -23,10 +23,7 @@ from .i_null import Inputs as InputsBase
 
 class Inputs(InputsBase):
     def __init__(self, keymap, renderer):
-        self.key_down = {}
-
-        for i in range(0x10):
-            self.key_down[i] = False
+        self.key_down = [False] * 0x10
 
         self.pygame_methods = {
             pygame.QUIT:    self._pygame_quit,
