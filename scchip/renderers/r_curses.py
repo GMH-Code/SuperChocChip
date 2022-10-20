@@ -81,11 +81,15 @@ class Renderer(RendererBase):
         self.shutdown()
 
     def set_resolution(self, width, height):
-        adjusted_width = width * self.scale + 1
+        # Fast-erase the current pad.  The new one may be smaller, and it will also be empty when initialised.
+        if self.pad:
+            self.pad.erase()
+            self.refresh_display(True)
 
         # We have to allow one extra character, presumably for the cursor, otherwise we can't write the furthest
         # bottom-right pixel.
-        self.pad = curses.newpad(height + 1, adjusted_width)
+        adjusted_width = width * self.scale + 1
+        self.pad = curses.newpad(height + 1, adjusted_width)  # Adding one additional line for the title bar
 
         if self.palette_index:
             # Sometimes the background is not erased correctly if using colours rather than inverted pixels.  This

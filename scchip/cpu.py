@@ -546,9 +546,9 @@ class CPU:
             self.debug("DRW V{:01x}, V{:01x}, 0x{:01x}".format(self.vx, self.vy, height))
 
         if height == 0 and self.arch >= ARCH_SUPERCHIP_1_0:
-            # Super-CHIP sprite.  Show 8x16 if low res, otherwise 16x16
+            # Super-CHIP sprite.  Show 16x16 even if in low res mode
             height = 16
-            width = 8 if self.lo_res else 16
+            width = 16
         else:
             # Standard non-Super-CHIP sprite
             width = 8
@@ -732,7 +732,9 @@ class CPU:
         if self.live_debug:
             self.debug("LOW")
 
-        if not self.lo_res:
+        if self.lo_res:
+            self.framebuffer.reset_vid()
+        else:
             self.framebuffer.resize_vid(64, 32)
             self.lo_res = True
 
@@ -743,6 +745,8 @@ class CPU:
         if self.lo_res:
             self.framebuffer.resize_vid(128, 64)
             self.lo_res = False
+        else:
+            self.framebuffer.reset_vid()
 
     def _Fx75(self):  # LD R, Vx
         if self.live_debug:

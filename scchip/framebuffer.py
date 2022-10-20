@@ -76,12 +76,17 @@ class Framebuffer():
             ram_bank.resize(self.vid_size)  # Update RAM size
 
         self.renderer.set_resolution(vid_width, vid_height)  # Update screen resolution
+        self.frame_delta = {}  # The video cache and the screen are now both blank
+
+    def reset_vid(self):
+        for ram_bank in self.ram_banks:
+            ram_bank.clear()
+
+        self._redraw_all()
 
     def clear(self):
         if not self.affect_planes:
             return
-
-        # We could fast-clear if there was only one plane rendering, but it's not worth it
 
         for plane in self.affect_planes:
             plane.clear()
@@ -180,7 +185,7 @@ class Framebuffer():
         self._redraw_all()
 
     def _redraw_all(self):
-        # Redraw whole screen after a scroll.  The video cache should take the load off the renderer a bit
+        # Redraw whole screen after a scroll or clear.  The video cache should take the load off the renderer a bit
         render_pixel = self._render_pixel
 
         for vram_loc in range(self.vid_size):

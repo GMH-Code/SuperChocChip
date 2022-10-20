@@ -23,6 +23,21 @@ class TestFrameBuffer(unittest.TestCase):
         self.assertEqual((4, 5), (self.renderer_mono.width, self.renderer_mono.height))
         self.assertEqual((3, 4), (self.renderer_col.width, self.renderer_col.height))
 
+    def test_framebuffer_reset_vid(self):
+        fb = self.framebuffer_col
+        fb.switch_planes(0b11)
+        affected_planes = fb.get_affected_planes()
+        self.assertEqual(2, len(affected_planes))
+
+        for plane in affected_planes:
+            fb.xor_pixel(2, 1, plane)
+            self.assertEqual("0000000000ff000000000000", plane.mem.hex())
+
+        fb.reset_vid()
+
+        for plane in affected_planes:
+            self.assertEqual("000000000000000000000000", plane.mem.hex())
+
     def test_framebuffer_plane_control(self):
         fbm = self.framebuffer_mono
         fbm.switch_planes(0b1)
