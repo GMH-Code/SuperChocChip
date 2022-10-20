@@ -106,12 +106,10 @@ class Framebuffer():
             return None
 
         vram_loc = y * self.vid_width + x
-        pixel = plane.read(vram_loc)
-        collision = (pixel != 0)
-        new_pixel = pixel ^ 0xFF
-        plane.write(vram_loc, new_pixel)
+        pixel = plane.read(vram_loc) ^ 0xFF
+        plane.write(vram_loc, pixel)
         self._render_pixel(vram_loc)
-        return collision
+        return not pixel
 
     def _render_pixel(self, vram_loc):
         # Render the pixel to the display

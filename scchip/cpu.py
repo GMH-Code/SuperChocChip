@@ -561,12 +561,14 @@ class CPU:
         big_sprite = width > 8
         rows_collided = 0
         i = self.i
+        ram_read = self.ram.read
+        framebuffer_xor_pixel = self.framebuffer.xor_pixel
 
         for affected_plane in self.framebuffer.get_affected_planes():
             for y in range(height):
                 spr_data = (
-                    (self.ram.read(i + y * 2) << 8) | self.ram.read(i + y * 2 + 1)
-                ) if big_sprite else self.ram.read(i + y)
+                    (ram_read(i + y * 2) << 8) | ram_read(i + y * 2 + 1)
+                ) if big_sprite else ram_read(i + y)
                 scr_y = y + vy_pos
                 row_collided = False
 
@@ -575,7 +577,7 @@ class CPU:
 
                     if pixel:
                         scr_x = x + vx_pos
-                        collision = self.framebuffer.xor_pixel(scr_x, scr_y, affected_plane)
+                        collision = framebuffer_xor_pixel(scr_x, scr_y, affected_plane)
 
                         if collision:
                             # Don't stop drawing.  Set the flag, and never unset it for this row.
@@ -702,9 +704,10 @@ class CPU:
 
         i = self.i
         i_bitmask = self.i_bitmask
+        ram_write = self.ram.write
 
         for reg in range(self.vx + 1):
-            self.ram.write((i + reg) & i_bitmask, self.v[reg])
+            ram_write((i + reg) & i_bitmask, self.v[reg])
 
         self._post_Fx55_Fx65()
 
@@ -714,9 +717,10 @@ class CPU:
 
         i = self.i
         i_bitmask = self.i_bitmask
+        ram_read = self.ram.read
 
         for reg in range(self.vx + 1):
-            self.v[reg] = self.ram.read((i + reg) & i_bitmask)
+            self.v[reg] = ram_read((i + reg) & i_bitmask)
 
         self._post_Fx55_Fx65()
 
@@ -836,9 +840,10 @@ class CPU:
         i = self.i
         i_bitmask = self.i_bitmask
         iter_back = vx > vy
+        ram_write = self.ram.write
 
         for offset in range(vx - vy + 1) if iter_back else range(vy - vx + 1):
-            self.ram.write((i + offset) & i_bitmask, self.v[(vx - offset) if iter_back else (vx + offset)])
+            ram_write((i + offset) & i_bitmask, self.v[(vx - offset) if iter_back else (vx + offset)])
 
     def _5xy3(self):  # XLD Vx, Vy
         vx = self.vx
@@ -850,9 +855,10 @@ class CPU:
         i = self.i
         i_bitmask = self.i_bitmask
         iter_back = vx > vy
+        ram_read = self.ram.read
 
         for offset in range(vx - vy + 1) if iter_back else range(vy - vx + 1):
-            self.v[(vx - offset) if iter_back else (vx + offset)] = self.ram.read((i + offset) & i_bitmask)
+            self.v[(vx - offset) if iter_back else (vx + offset)] = ram_read((i + offset) & i_bitmask)
 
     def _Fx00(self):  # XLDL I, addr
         # Only F000 is supported
