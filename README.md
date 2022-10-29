@@ -3,6 +3,7 @@ SuperChocChip Emulator
 
 This emulator can run ROMs (machine code binaries, usually games) for all the following systems:
 - CHIP-8
+- CHIP-8 -- Double-height screen
 - CHIP-48
 - Super-CHIP 1.0
 - Super-CHIP 1.1
@@ -53,16 +54,16 @@ All the 'CHIP' systems use a hexadecimal keypad for input.  The keys, (by defaul
 
     QWERTY        CHIP
     -------       -------
-    1 2 3 4  -->  7 8 9 C
+    1 2 3 4  -->  1 2 3 C
     Q W E R  -->  4 5 6 D
-    A S D F  -->  1 2 3 E
+    A S D F  -->  7 8 9 E
     Z X C V  -->  A 0 B F
 
 Command-line Parameters
 -----------------------
 
     Usage:
-        superchocchip.py [-h] [-a {chip8,schip1.0,chip48,schip1.1,xochip,xochip16}] [-c CLOCK_SPEED] [-r {pygame,curses,null}] [-s SCALE] [-f SMOOTHING] [-m {0,1}] [-k KEYMAP] [--curses_cursor_mode {0,1,2}] [--pygame_palette PYGAME_PALETTE] [--curses_palette CURSES_PALETTE] [--load_quirks {0,1}] [--shift_quirks {0,1}] [--logic_quirks {0,1}] [--index_overflow_quirks {0,1}] [--index_increment_quirks {0,1}] [--jump_quirks {0,1}] [--sprite_delay_quirks {0,1}] [--screen_wrap_quirks {0,1}] [-d]
+        superchocchip.py [-h] [-a {chip8,chip8hires,schip1.0,chip48,schip1.1,xochip,xochip16}] [-c CLOCK_SPEED] [-r {pygame,curses,null}] [-s SCALE] [-f SMOOTHING] [-m {0,1}] [-k KEYMAP] [--curses_cursor_mode {0,1,2}] [--pygame_palette PYGAME_PALETTE] [--curses_palette CURSES_PALETTE] [--load_quirks {0,1}] [--shift_quirks {0,1}] [--logic_quirks {0,1}] [--index_overflow_quirks {0,1}] [--index_increment_quirks {0,1}] [--jump_quirks {0,1}] [--sprite_delay_quirks {0,1}] [--screen_wrap_quirks {0,1}] [-d]
         filename
 
     Positional arguments:
@@ -70,8 +71,8 @@ Command-line Parameters
 
     Optional arguments:
         -h, --help            show this help message and exit
-        -a {chip8,schip1.0,chip48,schip1.1,xochip,xochip16}, --arch {chip8,schip1.0,chip48,schip1.1,xochip,xochip16}
-                              set CPU instructions, speed, and quirks automatically for CHIP-8, CHIP-48, Super-CHIP 1.0/1.1, XO-CHIP, or XO-CHIP 16-colour mode
+        -a {chip8,chip8hires,schip1.0,chip48,schip1.1,xochip,xochip16}, --arch {chip8,chip8hires,schip1.0,chip48,schip1.1,xochip,xochip16}
+                              set CPU instructions, speed, and quirks automatically for CHIP-8, CHIP-8 hi-res, CHIP-48, Super-CHIP 1.0/1.1, XO-CHIP, or XO-CHIP 16-colour mode
         -c CLOCK_SPEED, --clock_speed CLOCK_SPEED
                               override the CPU speed in operations/second, regardless of architecture (0 = force uncapped)
         -r {pygame,curses,null}, --renderer {pygame,curses,null}

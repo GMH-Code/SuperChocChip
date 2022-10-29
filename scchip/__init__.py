@@ -13,7 +13,7 @@ __copyright__ = "Copyright (C) 2022 Gregory Maynard-Hoare"
 __license__ = "GNU Affero General Public License v3.0"
 
 from .constants import (
-    APP_INTRO, APP_COPYRIGHT, ARCH_CHIP8, ARCH_SUPERCHIP_1_0, ARCH_XO_CHIP, ARCH_XO_CHIP_16, SUPPORTED_CPUS, CPU_QUIRKS
+    APP_INTRO, APP_COPYRIGHT, ARCH_SUPERCHIP_1_0, ARCH_XO_CHIP, ARCH_XO_CHIP_16, SUPPORTED_CPUS, CPU_QUIRKS
 )
 from .cpu import CPU
 from .debugger import Debugger
@@ -101,7 +101,7 @@ def main(args):
     # Write system fonts into RAM
     ram.write_block(0x50, loader.load_system_font("8"))
 
-    if arch > ARCH_CHIP8:
+    if arch >= ARCH_SUPERCHIP_1_0:
         ram.write_block(0xA0, loader.load_system_font("16"))
 
     # Read ROM binary and write it into RAM

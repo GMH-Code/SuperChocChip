@@ -17,7 +17,7 @@ __license__ = "GNU Affero General Public License v3.0"
 from time import perf_counter
 from random import randint
 from math import ceil
-from .constants import APP_INTRO, ARCH_CHIP8, ARCH_SUPERCHIP_1_0, ARCH_CHIP48, ARCH_SUPERCHIP_1_1, ARCH_XO_CHIP
+from .constants import APP_INTRO, ARCH_CHIP8_HIRES, ARCH_SUPERCHIP_1_0, ARCH_CHIP48, ARCH_SUPERCHIP_1_1, ARCH_XO_CHIP
 
 CPU_ENDIAN = "big"   # CHIP-8 is big-endian
 TIMER_FREQ = 60.0    # 60Hz emulated system timer refresh
@@ -54,6 +54,7 @@ class CPU:
             auto_clock_speed = clock_speed
 
         self.core_interval = None if auto_clock_speed <= 0 else 1.0 / auto_clock_speed
+        self.arch_is_dblheight = (arch == ARCH_CHIP8_HIRES)
         arch_is_schip = (arch >= ARCH_SUPERCHIP_1_0 and arch <= ARCH_SUPERCHIP_1_1)  # Includes CHIP-48
 
         """
@@ -68,15 +69,17 @@ class CPU:
         - Jump quirks           : Enabled on Super-CHIP-based systems only.
         """
 
-        self.load_quirks = (arch >= ARCH_SUPERCHIP_1_1 or arch == ARCH_CHIP8) if load_quirks is None else load_quirks
+        self.load_quirks = (
+            (arch <= ARCH_CHIP8_HIRES or arch >= ARCH_SUPERCHIP_1_1) if load_quirks is None else load_quirks
+        )
         self.shift_quirks = arch_is_schip if shift_quirks is None else shift_quirks
-        self.logic_quirks = (arch == ARCH_CHIP8) if logic_quirks is None else logic_quirks
+        self.logic_quirks = (arch <= ARCH_CHIP8_HIRES) if logic_quirks is None else logic_quirks
         self.index_overflow_quirks = False if index_overflow_quirks is None else index_overflow_quirks
         self.index_increment_quirks = (
             (arch == ARCH_CHIP48) if index_increment_quirks is None else index_increment_quirks
         )
         self.jump_quirks = arch_is_schip if jump_quirks is None else jump_quirks
-        self.sprite_delay_quirks = (arch == ARCH_CHIP8) if sprite_delay_quirks is None else sprite_delay_quirks
+        self.sprite_delay_quirks = (arch <= ARCH_CHIP8_HIRES) if sprite_delay_quirks is None else sprite_delay_quirks
 
         # Define instruction pointers.
         # n = Nibble
@@ -130,6 +133,10 @@ class CPU:
             0xF055: self._Fx55,
             0xF065: self._Fx65
         }
+
+        if self.arch_is_dblheight:
+            # Add instruction for CHIP-8 double-height resolution mode
+            self.instructions[0x0230] = self._0230
 
         if arch >= ARCH_SUPERCHIP_1_0:
             # Add instructions for Super-CHIP 1.0 and above
@@ -365,11 +372,22 @@ class CPU:
 
         self.pc = self.stack.pop()
 
+    def _0230(self):  # CLSHI
+        if self.live_debug:
+            self.debug("CLSHI")
+
+        self.framebuffer.clear()
+
     def _1nnn(self):  # JP addr
         if self.live_debug:
             self.debug("JP 0x{:03x}".format(self.addr))
 
-        self.pc = self.addr
+        if self.arch_is_dblheight and self.pc == 0x202 and self.addr == 0x260:
+            # Switch to double-height resolution mode and override the standard jump
+            self.framebuffer.resize_vid(64, 64)
+            self.pc = 0x2C0
+        else:
+            self.pc = self.addr
 
     def _2nnn(self):  # CALL addr
         if self.live_debug:
