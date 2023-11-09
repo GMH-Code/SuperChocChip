@@ -159,7 +159,6 @@ Notes
 ### Code Optimisation
 
 - Loops or condition blocks are avoided wherever possible to optimise emulation speed.  For example, this CPU uses bitmasks and hashed dictionaries to find the right OpCodes, rather than huge conditions and switch (C/C++) statements.
-- There are a few portions of the CPU code that are a bit repetitive, for example the checks to see if the debugger is active on each instruction.  This is preferred to the shorter, but slower method (calling unified debug functionality and then checking to see if the debugger is active before returning).
 
 ### Quirks
 
@@ -193,4 +192,4 @@ See the 'LICENSE' file for full details. The 'Affero' version of the GPL v3.0 ha
 
 ---
 
-Copyright (C) 2022 Gregory Maynard-Hoare, licensed under GNU Affero General Public License v3.0
+Copyright (C) 2022-2023 Gregory Maynard-Hoare, licensed under GNU Affero General Public License v3.0
