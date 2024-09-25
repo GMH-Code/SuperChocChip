@@ -54,6 +54,7 @@ class CPU:
             auto_clock_speed = clock_speed
 
         self.core_interval = None if auto_clock_speed <= 0 else 1.0 / auto_clock_speed
+        self.arch_is_chip48 = (arch == ARCH_CHIP48)
         self.arch_is_dblheight = (arch == ARCH_CHIP8_HIRES)
         arch_is_schip = (arch >= ARCH_SUPERCHIP_1_0 and arch <= ARCH_SUPERCHIP_1_1)  # Includes CHIP-48
 
@@ -75,9 +76,7 @@ class CPU:
         self.shift_quirks = arch_is_schip if shift_quirks is None else shift_quirks
         self.logic_quirks = (arch <= ARCH_CHIP8_HIRES) if logic_quirks is None else logic_quirks
         self.index_overflow_quirks = False if index_overflow_quirks is None else index_overflow_quirks
-        self.index_increment_quirks = (
-            (arch == ARCH_CHIP48) if index_increment_quirks is None else index_increment_quirks
-        )
+        self.index_increment_quirks = self.arch_is_chip48 if index_increment_quirks is None else index_increment_quirks
         self.jump_quirks = arch_is_schip if jump_quirks is None else jump_quirks
         self.sprite_delay_quirks = (arch <= ARCH_CHIP8_HIRES) if sprite_delay_quirks is None else sprite_delay_quirks
 
@@ -833,11 +832,11 @@ class CPU:
     def _00Cn(self):  # SCD n
         scroll_distance = self.nibble
 
-        if self.lo_res:
+        if self.arch_is_chip48 and self.lo_res:
             if scroll_distance & 1:
                 raise CPUError("Scrolling down vertically by a half-pixel in low resolution mode is unsupported.")
 
-            scroll_distance //= 2
+            scroll_distance >>= 1
 
         self.framebuffer.scroll_down(scroll_distance)
 
@@ -849,11 +848,11 @@ class CPU:
     def _00Dn(self):  # SCU n
         scroll_distance = self.nibble
 
-        if self.lo_res:
+        if self.arch_is_chip48 and self.lo_res:
             if scroll_distance & 1:
                 raise CPUError("Scrolling up vertically by a half-pixel in low resolution mode is unsupported.")
 
-            scroll_distance //= 2
+            scroll_distance >>= 1
 
         self.framebuffer.scroll_up(scroll_distance)
 

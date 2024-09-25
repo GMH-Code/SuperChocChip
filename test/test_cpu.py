@@ -403,13 +403,31 @@ class TestCPU(unittest.TestCase):
 
     def test_cpu_00cn_00dn(self):  # SCD n (Super-CHIP 1.1 and above) / SCU n (XO-CHIP only)
         for opcode in 0x00C1, 0x00D1:
-            self._check_opcode(0x00FE)  # Switch to lo-res mode
-            # Check half-pixel scrolling is raised as unsupported
+            # Switch to CHIP-48 and low-res modes
+            self.cpu.arch_is_chip48 = True
+            self._check_opcode(0x00FE)
+
+            # Check half-pixel scrolling in CHIP-48 is raised as unsupported
             self.assertRaises(CPUError, self._check_opcode, opcode)
+
+            # Check whole-pixel scrolling is supported in CHIP-48
             self._check_opcode(opcode + 1)
-            # Check regular scrolling
-            self._check_opcode(0x00FF)  # Switch to high-res mode
+
+            # Check high-res scrolling is supported in CHIP-48
+            self._check_opcode(0x00FF)
             self._check_opcode(opcode)  # This should now work
+            self._check_opcode(opcode + 1)  # Double-pixel scroll check
+
+            # Switch back to XO-CHIP and check low-res scrolling is now supported
+            self.cpu.arch_is_chip48 = False
+            self._check_opcode(0x00FE)
+            self._check_opcode(opcode)
+            self._check_opcode(opcode + 1)
+
+            # Check high-res scrolling
+            self._check_opcode(0x00FF)
+            self._check_opcode(opcode)
+            self._check_opcode(opcode + 1)
 
     # Tests for XO-CHIP
 

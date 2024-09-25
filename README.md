@@ -154,7 +154,7 @@ Notes
 
 ### Screen Modes and Sub-Pixel Scrolling
 
-- Due to the framebuffer implementation, and a huge performance increase, this emulator will not allow the unusual situation of half-pixel scrolls in low-resolution mode.  The display will also be cleared when the screen mode is changed.  No ROMs have been found which rely on the display staying intact during a mode change, and taking the rendering shortcuts result in one quarter of pixel blits in lower (standard) resolution modes.
+- Due to the framebuffer implementation, and a huge performance increase, this emulator will not allow the unusual situation of half-pixel scrolls in CHIP-48 low-resolution mode.  The display will also be cleared when the screen mode is changed.  No ROMs have been found which rely on the display staying intact during a mode change, and taking the rendering shortcuts result in one quarter of pixel blits in lower (standard) resolution modes.
 
 ### Code Optimisation
 
