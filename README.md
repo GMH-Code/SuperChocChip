@@ -10,20 +10,20 @@ This emulator can run ROMs (machine code binaries, usually games) for all the fo
 - XO-CHIP
 - XO-CHIP -- Extended colours
 
-It is written from the ground up in Pure Python, and runs on Linux (normally out of the box), Windows, Mac OS X, and more.
+It is written from the ground up in pure Python, and runs on Linux (usually right out of the box), Windows, macOS, and more.
 
-A computer is emulated with CPU, keypad, display, sound, etc.  It can run, and play, native ROMs freely available on the Internet at 100% speed, even on older hosts.
+SuperChocChip is fast, highly compatible, portable, and supports display, audio, and input plugins.  It works with interpreters *and* compilers, so nearly any ROM can be played at 100% speed, even on limited hosts.
 
 Screenshots
 -----------
 
-Here are some screenshots of various freely available games running in the emulator:
+Here are some screenshots of various freely available games running in SuperChocChip:
 
-![Kesha Was Ninja](./screenshots/keshawasninja.jpg) ![Chicken Scratch](./screenshots/chickenscratch.jpg) ![DVN8](./screenshots/dvn8.jpg) ![Into the GarlicScape](./screenshots/garlicscape.jpg) ![Super Neatboy](./screenshots/superneatboy.jpg) ![Octoma](./screenshots/octoma.jpg) ![Octopeg](./screenshots/octopeg.jpg) ![Rockto](./screenshots/rockto.jpg) ![Piper](./screenshots/piper.jpg) ![Civiliz8n](./screenshots/civiliz8n.jpg)
+![Kesha Was Niiinja](./screenshots/keshawasninja.jpg) ![Chicken Scratch](./screenshots/chickenscratch.jpg) ![DVN8](./screenshots/dvn8.jpg) ![Into The GarlicScape](./screenshots/garlicscape.jpg) ![Super NeatBoy](./screenshots/superneatboy.jpg) ![Octoma](./screenshots/octoma.jpg) ![Octopeg](./screenshots/octopeg.jpg) ![Rockto](./screenshots/rockto.jpg) ![HPIPER](./screenshots/hpiper.jpg) ![Civiliz8n](./screenshots/civiliz8n.jpg) ![D8GN](./screenshots/d8gn.jpg) ![An Evening to Die For](./screenshots/aneveningtodiefor.jpg) ![Enter the Mine](./screenshots/enterthemine.jpg) ![T8NKS](./screenshots/t8nks.jpg)
 
 It is also possible, in a somewhat limited extent, to use the Windows Command Prompt, Powershell, or the Terminal on Linux, as shown below.  You can also play multicolour games over an SSH connection:
 
-![Inv8sion](./screenshots/inv8sioncmd.jpg) ![Blinky](./screenshots/blinkycmd.jpg)
+![Alien Inv8sion](./screenshots/inv8sion-term.jpg) ![Blinky](./screenshots/blinky-term.jpg) ![3D Viper Maze](./screenshots/3dvipermaze-term.jpg) ![Eaty the Alien](./screenshots/eaty-term.jpg)
 
 Running a ROM
 -------------
@@ -43,7 +43,7 @@ Note that if you're running the emulator on Windows, you will need to either run
 Using the Optional PyPy JIT Compiler
 ------------------------------------
 
-The PyPy Just-In-Time compiler is supported for a huge (almost 10x average) speed increase, and it works really well with this emulator's code style.  Note that not all versions of PyPy have PyGame and Curses available.  You can look [here](https://pypi.org/project/pygame/#files) (no need to download anything) to find out in advance which version of PyPy you'll need to get to have PyGame support, if you'd like to try a high-performance mode.
+The PyPy Just-In-Time compiler is supported for a huge (10x - 90x) speed increase, and it works really well with this emulator's code style.  Note that not all versions of PyPy have PyGame and Curses available.  You can look [here](https://pypi.org/project/pygame/#files) (no need to download anything) to find out in advance which version of PyPy you'll need to get to have PyGame support, if you'd like to try a high-performance mode.
 
 If you'd like to use Curses on Linux or Mac OS X, the latest 64-bit or 32-bit versions of PyPy should work.  PyPy doesn't yet have a version of Windows-Curses.
 
@@ -113,15 +113,15 @@ The CPU includes variants of:
 
 Depending on the hardware/modes chosen in the emulator, included is:
 - 4KB / 64KB system RAM with byte/block access and fast moves
-- 64x32 / 128x64 monochromatic, 4-colour / 16-colour displays
+- 64x32 / 64x64 / 128x64 displays with monochromatic, 4-colour, and 16-colour depths
 - 4KB video RAM with legacy modes (1KB, 256-byte etc.)
 - 12-level / 16-level 12-bit CPU call stacks
 - 16x 8-bit aligned system registers
 - 16x user flag registers
 - 1x 16-bit index register (address storage)
 - 1x 12-bit program counter
-- 1x main system clock
-- 2x independent delay / sound hardware timers
+- 1x main system clock (scaled or fixed frequency)
+- 2x independent delay and sound hardware timers
 - 1x video timer
 - 1x video framebuffer, supporting multiple planes / VRAM banks
 - 2x video blitters, supported via plugin
@@ -133,7 +133,7 @@ Supported Features
 ------------------
 
 - Large, small, and colour sprites.  ROMs which make use of 4 planes (16-colours) are also supported, even though the specification on this is still unofficial.
-- Fast 4-way scrolling.
+- Fast, plane-independent, 4-way display scrolling.
 - The extra video timer is set to 60Hz, which ensures unnecessary rendering and flickering doesn't occur.  Modern games that use the delay timer to provide VSync emulation are supported.
 - Performance monitoring output (frames drawn and instructions executed per second).
 - Live visual disassembly of OpCodes/instructions about to be run (disabled by default, unless a CPU exception occurs).
@@ -192,4 +192,4 @@ See the 'LICENSE' file for full details. The 'Affero' version of the GPL v3.0 ha
 
 ---
 
-Copyright (C) 2022-2023 Gregory Maynard-Hoare, licensed under GNU Affero General Public License v3.0
+Copyright (C) 2022-2024 Gregory Maynard-Hoare, licensed under GNU Affero General Public License v3.0
