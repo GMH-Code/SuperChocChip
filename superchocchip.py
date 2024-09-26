@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 __author__ = "Gregory Maynard-Hoare"
-__copyright__ = "Copyright (C) 2023 Gregory Maynard-Hoare"
+__copyright__ = "Copyright (C) 2024 Gregory Maynard-Hoare"
 __license__ = "GNU Affero General Public License v3.0"
-__version__ = "1.4.1"
+__version__ = "1.4.2"
 
 from argparse import ArgumentParser
 from scchip import main

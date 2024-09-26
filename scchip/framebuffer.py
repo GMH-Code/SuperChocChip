@@ -192,7 +192,6 @@ class Framebuffer():
     def refresh_display(self):
         # Request the renderer updates altered pixels and then refreshes the display.  This method results in a huge
         # (around 5x) speed up when using PyPy with graphically-intensive games, and a tiny improvement with CPython.
-        vid_width = self.vid_width
         vid_cache_read = self.vid_cache.read
         vid_cache_write = self.vid_cache.write
         renderer_set_pixel = self.renderer.set_pixel
@@ -200,7 +199,7 @@ class Framebuffer():
 
         for vram_loc, colour in self.frame_delta.items():
             if vid_cache_read(vram_loc) != colour:
-                renderer_set_pixel(vram_loc % vid_width, vram_loc // vid_width, colour)
+                renderer_set_pixel(vram_loc, colour)
                 vid_cache_write(vram_loc, colour)
                 content_changed = True
 

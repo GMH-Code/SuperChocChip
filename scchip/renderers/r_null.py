@@ -27,7 +27,7 @@ class Renderer:
         self.width = width
         self.height = height
 
-    def set_pixel(self, x, y, colour):  # pylint: disable=unused-argument
+    def set_pixel(self, location, colour):  # pylint: disable=unused-argument
         pass
 
     def refresh_display(self, content_changed=False):

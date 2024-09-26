@@ -99,13 +99,15 @@ class Renderer(RendererBase):
         super().set_resolution(width, height)
         self.set_title(APP_NAME)
 
-    def set_pixel(self, x, y, colour):
+    def set_pixel(self, location, colour):
         if self.palette_index:
             curses_colour = curses.color_pair(self.palette_index[colour])
         else:
             curses_colour = curses.A_REVERSE if colour else curses.A_NORMAL
 
-        self.pad.addstr(y + 1, x * self.scale, self.pixel_char, curses_colour)
+        self.pad.addstr(
+            (location // self.width) + 1, (location % self.width) * self.scale, self.pixel_char, curses_colour
+        )
 
     def refresh_display(self, content_changed=False):
         screen_height, screen_width = self.screen.getmaxyx()  # This doesn't seem to ever change/work on Windows?!
