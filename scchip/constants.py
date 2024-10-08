@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 
+__author__ = "Gregory Maynard-Hoare"
 __copyright__ = "Copyright (C) 2024 Gregory Maynard-Hoare"
 __license__ = "GNU Affero General Public License v3.0"
+__version__ = "1.4.3"
 
 # App identification
 APP_NAME = "SuperChocChip Emulator"
-APP_VERSION = "1.4.2"
-APP_COPYRIGHT = "Copyright (C) 2023 Gregory Maynard-Hoare, licensed under GNU Affero General Public License v3.0"
+APP_VERSION = __version__
+APP_COPYRIGHT = "".join((__copyright__, ", licensed under ", __license__))
 APP_INTRO = "{} V{} -- ".format(APP_NAME, APP_VERSION)
 
 # Emulated system architectures

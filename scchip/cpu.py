@@ -54,8 +54,8 @@ class CPU:
             auto_clock_speed = clock_speed
 
         self.core_interval = None if auto_clock_speed <= 0 else 1.0 / auto_clock_speed
-        self.arch_is_chip48 = (arch == ARCH_CHIP48)
         self.arch_is_dblheight = (arch == ARCH_CHIP8_HIRES)
+        self.arch_is_halfscroll = (arch < ARCH_XO_CHIP)  # Half-pixel scroll systems
         arch_is_schip = (arch >= ARCH_SUPERCHIP_1_0 and arch <= ARCH_SUPERCHIP_1_1)  # Includes CHIP-48
 
         """
@@ -68,6 +68,7 @@ class CPU:
         - Index overflow quirks : Disabled.  Some Super-CHIP games fail if enabled.
         - Index increment quirks: Enabled for accurate CHIP-48 behaviour only.
         - Jump quirks           : Enabled on Super-CHIP-based systems only.
+        - Sprite delay quirks   : Enabled on CHIP-8, CHIP-8 double-height, and CHIP-48.  Only active in low-res mode.
         """
 
         self.load_quirks = (
@@ -76,9 +77,13 @@ class CPU:
         self.shift_quirks = arch_is_schip if shift_quirks is None else shift_quirks
         self.logic_quirks = (arch <= ARCH_CHIP8_HIRES) if logic_quirks is None else logic_quirks
         self.index_overflow_quirks = False if index_overflow_quirks is None else index_overflow_quirks
-        self.index_increment_quirks = self.arch_is_chip48 if index_increment_quirks is None else index_increment_quirks
+        self.index_increment_quirks = (
+            arch == ARCH_CHIP48
+        ) if index_increment_quirks is None else index_increment_quirks
         self.jump_quirks = arch_is_schip if jump_quirks is None else jump_quirks
-        self.sprite_delay_quirks = (arch <= ARCH_CHIP8_HIRES) if sprite_delay_quirks is None else sprite_delay_quirks
+        self.sprite_delay_quirks = (
+            (arch <= ARCH_CHIP8_HIRES) or (arch == ARCH_CHIP48)
+        ) if sprite_delay_quirks is None else sprite_delay_quirks
 
         # Define instruction pointers.
         # n = Nibble
@@ -623,8 +628,8 @@ class CPU:
         # Super-CHIP 1.1 and above reports number of rows collided
         self.v[0xF] = int(rows_collided > 0) if self.arch < ARCH_SUPERCHIP_1_1 else rows_collided
 
-        # Wait for vertical blanking interrupt.  Normally only used if emulating original CHIP-8 system
-        if self.sprite_delay_quirks:
+        # Wait for vertical blanking interrupt in low-res mode.  Normally only used by early CHIP-8 and CHIP-48 systems
+        if self.sprite_delay_quirks and self.lo_res:
             self.vblank_wait = True
 
     def _Ex9E_d(self):  # SKP Vx (debug)
@@ -812,13 +817,13 @@ class CPU:
         self.debug("SCR")
 
     def _00FB(self):  # SCR
-        self.framebuffer.scroll_right(2 if self.lo_res else 4)
+        self.framebuffer.scroll_right(2 if self.arch_is_halfscroll and self.lo_res else 4)
 
     def _00FC_d(self):  # SCL (debug)
         self.debug("SCL")
 
     def _00FC(self):  # SCL
-        self.framebuffer.scroll_left(2 if self.lo_res else 4)
+        self.framebuffer.scroll_left(2 if self.arch_is_halfscroll and self.lo_res else 4)
 
     def _Fx30_d(self):  # LD HF, Vx (debug)
         self.debug("LD HF, V{:01x}".format(self.vx))
@@ -832,7 +837,7 @@ class CPU:
     def _00Cn(self):  # SCD n
         scroll_distance = self.nibble
 
-        if self.arch_is_chip48 and self.lo_res:
+        if self.arch_is_halfscroll and self.lo_res:
             if scroll_distance & 1:
                 raise CPUError("Scrolling down vertically by a half-pixel in low resolution mode is unsupported.")
 
@@ -848,7 +853,7 @@ class CPU:
     def _00Dn(self):  # SCU n
         scroll_distance = self.nibble
 
-        if self.arch_is_chip48 and self.lo_res:
+        if self.arch_is_halfscroll and self.lo_res:
             if scroll_distance & 1:
                 raise CPUError("Scrolling up vertically by a half-pixel in low resolution mode is unsupported.")
 
