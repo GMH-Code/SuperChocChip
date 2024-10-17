@@ -90,24 +90,28 @@ class CPU:
         # kk = Byte
         # nnn = address
         # x/y = register (0-15)
+
+        # Initial lookup for instructions' first nibble
+        self.instruction_nibble = [
+            self._0nnn,  # Alias for bitmask 0xFFFF
+            self._1nnn,
+            self._2nnn,
+            self._3xkk,
+            self._4xkk,
+            self._5nnn_8nnn_9nnn,  # Alias for bitmask 0xF00F
+            self._6xkk,
+            self._7xkk,
+            self._5nnn_8nnn_9nnn,  # Alias for bitmask 0xF00F
+            self._5nnn_8nnn_9nnn,  # Alias for bitmask 0xF00F
+            self._Annn,
+            self._Bnnn,
+            self._Cxkk,
+            self._Dxyn,
+            self._Ennn_Fnnn,  # Alias for bitmask 0xF0FF
+            self._Ennn_Fnnn,  # Alias for bitmask 0xF0FF
+        ]
+
         self.instructions = {
-            # Initial lookup for instructions' first nibble
-            0x0: self._0nnn,  # Alias for bitmask 0xFFFF
-            0x1: self._1nnn,
-            0x2: self._2nnn,
-            0x3: self._3xkk,
-            0x4: self._4xkk,
-            0x5: self._5nnn_8nnn_9nnn,  # Alias for bitmask 0xF00F
-            0x6: self._6xkk,
-            0x7: self._7xkk,
-            0x8: self._5nnn_8nnn_9nnn,  # Alias for bitmask 0xF00F
-            0x9: self._5nnn_8nnn_9nnn,  # Alias for bitmask 0xF00F
-            0xA: self._Annn,
-            0xB: self._Bnnn,
-            0xC: self._Cxkk,
-            0xD: self._Dxyn,
-            0xE: self._Ennn_Fnnn,  # Alias for bitmask 0xF0FF
-            0xF: self._Ennn_Fnnn,  # Alias for bitmask 0xF0FF
             # Instructions beginning with nibble 0x0, bitmask 0xFFFF (i.e., exact match)
             0x00E0: self._00E0,
             0x00EE: self._00EE,
@@ -310,7 +314,7 @@ class CPU:
         instruction()
 
     def decode_exec(self):
-        self._call_masked_instruction((0xF000 & self.opcode) >> 12)
+        self.instruction_nibble[self.opcode >> 12]()
 
     def refresh_framebuffer(self):
         # Render pending delta screen updates.  Should be called whenever there
@@ -362,13 +366,7 @@ class CPU:
         self.debugger.output(self, instruction)
 
     def _0nnn(self):
-        opcode = self.opcode
-
-        if opcode < 0x10:
-            # Let's use opcodes 0x0 - 0xF internally for indexing, since they're not used on any CHIP-8 variant
-            self._opcode_unsupported()
-
-        self._call_masked_instruction(opcode)
+        self._call_masked_instruction(self.opcode)
 
     def _5nnn_8nnn_9nnn(self):
         self._call_masked_instruction(self.opcode & 0xF00F)
